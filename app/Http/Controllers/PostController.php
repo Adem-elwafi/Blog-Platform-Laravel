@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;              // your Post model
+use App\Models\Post;            // your Post model
 use Illuminate\Http\Request;      // for handling form requests
 use Illuminate\Support\Facades\Auth; // if you check current user
 
