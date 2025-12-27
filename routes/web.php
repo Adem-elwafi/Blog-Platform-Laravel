@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,9 @@ Route::middleware(['admin'])->group(function () {
         return view('admin.dashboard');
     });
 });
+
+
+Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->middleware('auth');
 
 
 require __DIR__.'/auth.php';
