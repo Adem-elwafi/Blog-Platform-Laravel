@@ -39,4 +39,17 @@
             </form>
         </div>
     @endif
+    <div class="mt-4">
+    <p>Likes: {{ $post->likes()->count() }}</p>
+
+    @auth
+        <form method="POST" action="{{ route('posts.like', $post) }}">
+            @csrf
+            <button type="submit" class="px-4 py-2 bg-pink-500 text-white rounded">
+                {{ auth()->user()->likes->contains($post->id) ? 'Unlike' : 'Like' }}
+            </button>
+        </form>
+    @endauth
+</div>
+
 </x-app-layout>
