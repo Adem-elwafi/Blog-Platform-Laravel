@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\LikeController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,6 +31,10 @@ Route::middleware(['admin'])->group(function () {
 
 
 Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->middleware('auth');
+
+Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
+    ->middleware('auth')
+    ->name('posts.like');
 
 
 require __DIR__.'/auth.php';
