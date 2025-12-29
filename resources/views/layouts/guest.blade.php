@@ -30,11 +30,14 @@
                 {{ $slot }}
             </div>
 
-            <!-- Footer Link -->
+            <!-- Footer -->
             <div class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-                <a href="{{ route('dashboard') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold">
-                    ← Back to Home
-                </a>
+                <ul class="inline-flex items-center gap-4">
+                    <li><a href="{{ url('/') }}" class="hover:underline">Home</a></li>
+                    <li><a href="#" class="hover:underline">About</a></li>
+                    <li><a href="#" class="hover:underline">Contact</a></li>
+                    <li><a href="https://github.com/Adem-dev/blog-platform" target="_blank" rel="noopener" class="hover:underline">GitHub</a></li>
+                </ul>
             </div>
         </div>
     </body>

@@ -12,7 +12,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('posts', PostController::class)->middleware('auth');
+// Public posts listing and detail
+Route::resource('posts', PostController::class)->only(['index', 'show']);
+
+// Authenticated actions on posts
+Route::resource('posts', PostController::class)
+    ->except(['index', 'show'])
+    ->middleware(['auth']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -30,16 +36,18 @@ Route::get('/admin/dashboard', [AdminController::class, 'index'])
     ->middleware('admin')
     ->name('admin.dashboard');
 
-Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->middleware('auth');
-
-Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
-    ->middleware('auth')
-    ->name('posts.like');
+// Comments & Likes (auth + rate limit)
 Route::post('/posts/{post}/comments', [CommentController::class, 'store'])
-    ->middleware(['auth', 'rate.limit']);
+    ->middleware(['auth', 'rate.limit'])
+    ->name('posts.comments.store');
+
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])
+    ->middleware(['auth'])
+    ->name('comments.destroy');
 
 Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
-    ->middleware(['auth', 'rate.limit']);
+    ->middleware(['auth', 'rate.limit'])
+    ->name('posts.like');
 
 
 require __DIR__.'/auth.php';

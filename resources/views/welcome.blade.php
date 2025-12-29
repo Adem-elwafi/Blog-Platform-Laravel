@@ -11,135 +11,66 @@
     <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <div class="flex flex-col min-h-screen">
             <!-- Navigation -->
-            <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
+            <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
-                        <a href="{{ route('dashboard') }}" class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                            {{ config('app.name', 'Blog') }}
+                        <a href="{{ url('/') }}" class="text-2xl font-bold text-blue-600 dark:text-blue-400 cursor-pointer">
+                            {{ config('app.name', 'Blog Platform') }}
                         </a>
                         <div class="flex items-center space-x-4">
                             @auth
-                                <a href="{{ route('posts.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">Posts</a>
-                                <a href="{{ route('posts.create') }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">Create</a>
+                                 <a href="{{ route('posts.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium cursor-pointer">Posts</a>
+                                 <a href="{{ route('posts.create') }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition cursor-pointer">Create</a>
                                 @if(Auth::user()->role === 'admin')
-                                    <a href="{{ route('admin.dashboard') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">Admin</a>
+                                     <a href="{{ route('admin.dashboard') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium cursor-pointer">Admin Dashboard</a>
                                 @endif
                             @else
-                                <a href="{{ route('login') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">Login</a>
-                                <a href="{{ route('register') }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">Register</a>
+                                 <a href="{{ route('login') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium cursor-pointer">Login</a>
+                                 <a href="{{ route('register') }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition cursor-pointer">Register</a>
                             @endauth
                         </div>
                     </div>
                 </div>
             </nav>
 
-            <!-- Hero Section -->
-            <div class="flex-grow">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                        <div>
-                            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-                                Share Your <span class="text-blue-600 dark:text-blue-400">Stories</span>
-                            </h1>
-                            <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
-                                Welcome to our blogging platform. Connect with a community of writers, share your thoughts, and discover inspiring stories from around the world.
-                            </p>
-                            <div class="flex flex-col sm:flex-row gap-4">
-                                @auth
-                                    <a href="{{ route('posts.index') }}" class="inline-flex items-center justify-center px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition shadow-lg hover:shadow-xl">
-                                        Read Posts
-                                    </a>
-                                    <a href="{{ route('posts.create') }}" class="inline-flex items-center justify-center px-8 py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg font-semibold transition">
-                                        Create Post
-                                    </a>
-                                @else
-                                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition shadow-lg hover:shadow-xl">
-                                        Get Started
-                                    </a>
-                                    <a href="{{ route('posts.index') }}" class="inline-flex items-center justify-center px-8 py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg font-semibold transition">
-                                        Browse Posts
-                                    </a>
-                                @endauth
-                            </div>
-                        </div>
-                        <div class="hidden md:block">
-                            <div class="bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-700 dark:to-blue-900 rounded-lg p-8 text-white shadow-xl">
-                                <div class="text-6xl mb-4">📝</div>
-                                <h3 class="text-2xl font-bold mb-4">Everything You Need</h3>
-                                <ul class="space-y-3 text-blue-100">
-                                    <li class="flex items-center">
-                                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Create & publish posts
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Engage with comments
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Like your favorite posts
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Connect with writers
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                <!-- Hero Section -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">{{ config('app.name', 'Blog Platform') }}</h1>
+                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">A clean, minimal blog platform for posts, comments, and likes.</p>
+                    <div class="mt-8">
+                        <a href="{{ route('posts.index') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold cursor-pointer">Get Started</a>
                     </div>
                 </div>
 
                 <!-- Features Section -->
                 <div class="bg-white dark:bg-gray-800 py-16 border-t border-gray-200 dark:border-gray-700">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h2 class="text-4xl font-bold text-center text-gray-900 dark:text-white mb-12">Why Choose Our Platform?</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div class="text-center">
-                                <div class="h-16 w-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Fast & Responsive</h3>
-                                <p class="text-gray-600 dark:text-gray-400">Our platform is optimized for speed and works seamlessly across all devices.</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="h-16 w-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Secure</h3>
-                                <p class="text-gray-600 dark:text-gray-400">Your content and data are protected with modern security standards.</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="h-16 w-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Community</h3>
-                                <p class="text-gray-600 dark:text-gray-400">Connect with writers and readers who share your interests.</p>
-                            </div>
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Posts</h3>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Create and browse posts with a simple interface.</p>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Comments</h3>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Discuss ideas with clean, minimal comment threads.</p>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Likes</h3>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Engage with content using a simple like toggle.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Footer -->
-            <footer class="bg-gray-800 dark:bg-gray-950 text-gray-100 mt-12">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
-                        <p class="text-gray-400">&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}. All rights reserved.</p>
-                        <p class="text-gray-400 mt-4 md:mt-0">Crafted with ❤️ for the community</p>
+            <footer class="bg-gray-800 dark:bg-gray-950 text-gray-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <p class="text-gray-400">&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}</p>
+                        <ul class="flex items-center gap-6 text-sm">
+                            <li><a href="#" class="text-gray-300 hover:text-white cursor-pointer">About</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white cursor-pointer">Contact</a></li>
+                            <li><a href="https://github.com/Adem-dev/blog-platform" target="_blank" rel="noopener" class="text-gray-300 hover:text-white cursor-pointer">GitHub</a></li>
+                        </ul>
                     </div>
                 </div>
             </footer>
@@ -147,7 +78,7 @@
     </body>
 </html>
 
-        <!-- Styles / Scripts -->
+    <!--
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @else
@@ -207,7 +138,7 @@
                                         height="11"
                                         viewBox="0 0 10 11"
                                         fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
+                                            <title>{{ config('app.name', 'Blog Platform') }}</title>
                                         class="w-2.5 h-2.5"
                                     >
                                         <path
@@ -235,6 +166,51 @@
                                         viewBox="0 0 10 11"
                                         fill="none"
                                         xmlns="http://www.w3.org/2000/svg"
+
+                                                <header class="bg-white dark:bg-gray-900">
+                                                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+                                                        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">{{ config('app.name', 'Blog Platform') }}</h1>
+                                                        <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">A clean, minimal blog platform for posts, comments, and likes.</p>
+                                                        <div class="mt-8">
+                                                            <a href="{{ route('posts.index') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold">Get Started</a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+
+                                                <main class="flex-grow">
+                                                    <div class="bg-white dark:bg-gray-800 py-16 border-t border-gray-200 dark:border-gray-700">
+                                                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                                                            <div class="text-center">
+                                                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Posts</h3>
+                                                                <p class="mt-2 text-gray-600 dark:text-gray-400">Create and browse posts with a simple interface.</p>
+                                                            </div>
+                                                            <div class="text-center">
+                                                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Comments</h3>
+                                                                <p class="mt-2 text-gray-600 dark:text-gray-400">Discuss ideas with clean, minimal comment threads.</p>
+                                                            </div>
+                                                            <div class="text-center">
+                                                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Likes</h3>
+                                                                <p class="mt-2 text-gray-600 dark:text-gray-400">Engage with content using a simple like toggle.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </main>
+
+                                                <footer class="bg-gray-800 dark:bg-gray-950 text-gray-100">
+                                                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                                                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                                            <p class="text-gray-400">&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}</p>
+                                                            <ul class="flex items-center gap-6 text-sm">
+                                                                <li><a href="#" class="text-gray-300 hover:text-white">About</a></li>
+                                                                <li><a href="#" class="text-gray-300 hover:text-white">Contact</a></li>
+                                                                <li><a href="https://github.com/Adem-dev/blog-platform" target="_blank" rel="noopener" class="text-gray-300 hover:text-white">GitHub</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </footer>
+                                            </div>
+                                        </body>
+                                    </html>
                                         class="w-2.5 h-2.5"
                                     >
                                         <path
@@ -412,3 +388,4 @@
         @endif
     </body>
 </html>
+-->

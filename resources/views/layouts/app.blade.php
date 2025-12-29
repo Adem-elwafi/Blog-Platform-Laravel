@@ -74,31 +74,14 @@
 
             <!-- Footer -->
             <footer class="bg-gray-800 dark:bg-gray-950 text-gray-100 mt-12">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                        <div>
-                            <h3 class="text-lg font-bold mb-4">{{ config('app.name', 'Blog Platform') }}</h3>
-                            <p class="text-gray-400">A modern blogging platform for sharing your thoughts and ideas with the world.</p>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                            <ul class="space-y-2">
-                                <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-100 transition">Home</a></li>
-                                <li><a href="{{ route('posts.index') }}" class="text-gray-400 hover:text-gray-100 transition">Posts</a></li>
-                                @auth
-                                    <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-100 transition">Dashboard</a></li>
-                                @endauth
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-semibold mb-4">Contact</h4>
-                            <p class="text-gray-400">Have questions? We'd love to hear from you.</p>
-                            <p class="text-gray-400 mt-2">Email: contact@blogplatform.com</p>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
-                        <p class="text-gray-400">&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}. All rights reserved.</p>
-                        <p class="text-gray-400 mt-4 md:mt-0">Crafted with ❤️ for the community</p>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <p class="text-gray-400">&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}</p>
+                        <ul class="flex items-center gap-6 text-sm">
+                            <li><a href="#" class="text-gray-300 hover:text-white">About</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white">Contact</a></li>
+                            <li><a href="https://github.com/Adem-dev/blog-platform" target="_blank" rel="noopener" class="text-gray-300 hover:text-white">GitHub</a></li>
+                        </ul>
                     </div>
                 </div>
             </footer>

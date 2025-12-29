@@ -5,14 +5,14 @@
             <div class="flex items-center">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="text-xl font-bold text-blue-600 dark:text-blue-400">
+                    <a href="{{ url('/') }}" class="text-xl font-bold text-blue-600 dark:text-blue-400">
                         {{ config('app.name', 'Blog') }}
                     </a>
                 </div>
 
                 <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <a href="{{ route('dashboard') }}" class="px-1 pt-1 border-b-2 text-base font-medium {{ request()->routeIs('dashboard') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:text-gray-900 dark:hover:text-gray-100' }}">
+                    <a href="{{ url('/') }}" class="px-1 pt-1 border-b-2 text-base font-medium {{ request()->is('/') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:text-gray-900 dark:hover:text-gray-100' }}">
                         {{ __('Home') }}
                     </a>
                     <a href="{{ route('posts.index') }}" class="px-1 pt-1 border-b-2 text-base font-medium {{ request()->routeIs('posts.*') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:text-gray-900 dark:hover:text-gray-100' }}">
@@ -21,7 +21,7 @@
                     @auth
                         @if(Auth::user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}" class="px-1 pt-1 border-b-2 text-base font-medium {{ request()->routeIs('admin.*') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:text-gray-900 dark:hover:text-gray-100' }}">
-                                {{ __('Admin') }}
+                                {{ __('Admin Dashboard') }}
                             </a>
                         @endif
                     @endauth
@@ -99,7 +99,7 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+            <a href="{{ url('/') }}" class="block px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
                 {{ __('Home') }}
             </a>
             <a href="{{ route('posts.index') }}" class="block px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
