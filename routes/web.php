@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\AdminController;
 
 
 Route::get('/', function () {
@@ -29,6 +30,10 @@ Route::middleware(['admin'])->group(function () {
     });
 });
 
+
+Route::get('/admin/dashboard', [AdminController::class, 'index'])
+    ->middleware('admin')
+    ->name('admin.dashboard');
 
 Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->middleware('auth');
 
