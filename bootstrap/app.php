@@ -19,7 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web([
         \App\Http\Middleware\ActionLoggingMiddleware::class,
         ]);
+        $middleware->alias([
+        'rate.limit' => \App\Http\Middleware\RateLimitMiddleware::class,
+        ]);
 })
+
+
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
