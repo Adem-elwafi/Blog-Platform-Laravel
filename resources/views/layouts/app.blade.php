@@ -14,9 +14,49 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <div class="flex flex-col min-h-screen">
+            <!-- Navigation -->
             @include('layouts.navigation')
+
+            <!-- Flash Messages -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+                @if ($message = Session::get('success'))
+                    <div class="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ $message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.style.display='none';" class="text-green-800 dark:text-green-200">×</button>
+                    </div>
+                @endif
+
+                @if ($message = Session::get('error'))
+                    <div class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ $message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.style.display='none';" class="text-red-800 dark:text-red-200">×</button>
+                    </div>
+                @endif
+
+                @if ($message = Session::get('warning'))
+                    <div class="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded-lg flex items-center justify-between" role="alert">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ $message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.style.display='none';" class="text-yellow-800 dark:text-yellow-200">×</button>
+                    </div>
+                @endif
+            </div>
 
             <!-- Page Heading -->
             @isset($header)
@@ -28,9 +68,40 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main class="flex-grow">
                 {{ $slot }}
             </main>
+
+            <!-- Footer -->
+            <footer class="bg-gray-800 dark:bg-gray-950 text-gray-100 mt-12">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">{{ config('app.name', 'Blog Platform') }}</h3>
+                            <p class="text-gray-400">A modern blogging platform for sharing your thoughts and ideas with the world.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                            <ul class="space-y-2">
+                                <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-100 transition">Home</a></li>
+                                <li><a href="{{ route('posts.index') }}" class="text-gray-400 hover:text-gray-100 transition">Posts</a></li>
+                                @auth
+                                    <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-100 transition">Dashboard</a></li>
+                                @endauth
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                            <p class="text-gray-400">Have questions? We'd love to hear from you.</p>
+                            <p class="text-gray-400 mt-2">Email: contact@blogplatform.com</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
+                        <p class="text-gray-400">&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}. All rights reserved.</p>
+                        <p class="text-gray-400 mt-4 md:mt-0">Crafted with ❤️ for the community</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     </body>
 </html>
