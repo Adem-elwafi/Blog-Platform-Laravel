@@ -16,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminMiddleware::class,
         ]);
-    })
+        $middleware->web([
+        \App\Http\Middleware\ActionLoggingMiddleware::class,
+        ]);
+})
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

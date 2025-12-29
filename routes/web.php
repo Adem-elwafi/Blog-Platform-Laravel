@@ -35,6 +35,11 @@ Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->midd
 Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
     ->middleware('auth')
     ->name('posts.like');
+Route::post('/posts/{post}/comments', [CommentController::class, 'store'])
+    ->middleware(['auth', 'rate.limit']);
+
+Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
+    ->middleware(['auth', 'rate.limit']);
 
 
 require __DIR__.'/auth.php';
