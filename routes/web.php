@@ -12,42 +12,39 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Public posts listing and detail
-Route::resource('posts', PostController::class)->only(['index', 'show']);
-
-// Authenticated actions on posts
-Route::resource('posts', PostController::class)
-    ->except(['index', 'show'])
-    ->middleware(['auth']);
-
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Authenticated actions on posts
+    Route::resource('posts', PostController::class)->except(['index', 'show']);
+
+    // Comments & Likes (auth + rate limit where applicable)
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])
+        ->middleware(['rate.limit'])
+        ->name('posts.comments.store');
+
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])
+        ->name('comments.destroy');
+
+    Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
+        ->middleware(['rate.limit'])
+        ->name('posts.like');
+
+    // Profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Public posts listing and detail (registered after auth routes so /posts/create matches the create route)
+Route::resource('posts', PostController::class)->only(['index', 'show']);
 
 
 Route::get('/admin/dashboard', [AdminController::class, 'index'])
     ->middleware('admin')
     ->name('admin.dashboard');
-
-// Comments & Likes (auth + rate limit)
-Route::post('/posts/{post}/comments', [CommentController::class, 'store'])
-    ->middleware(['auth', 'rate.limit'])
-    ->name('posts.comments.store');
-
-Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])
-    ->middleware(['auth'])
-    ->name('comments.destroy');
-
-Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
-    ->middleware(['auth', 'rate.limit'])
-    ->name('posts.like');
 
 
 require __DIR__.'/auth.php';

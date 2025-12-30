@@ -19,6 +19,9 @@
                         {{ __('Posts') }}
                     </a>
                     @auth
+                        <a href="{{ route('dashboard') }}" class="px-1 pt-1 border-b-2 text-base font-medium {{ request()->routeIs('dashboard') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:text-gray-900 dark:hover:text-gray-100' }}">
+                            {{ __('Dashboard') }}
+                        </a>
                         @if(Auth::user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}" class="px-1 pt-1 border-b-2 text-base font-medium {{ request()->routeIs('admin.*') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:text-gray-900 dark:hover:text-gray-100' }}">
                                 {{ __('Admin Dashboard') }}
@@ -106,6 +109,9 @@
                 {{ __('Posts') }}
             </a>
             @auth
+                <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+                    {{ __('Dashboard') }}
+                </a>
                 @if(Auth::user()->role === 'admin')
                     <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
                         {{ __('Admin') }}

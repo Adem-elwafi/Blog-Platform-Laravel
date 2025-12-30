@@ -33,7 +33,18 @@ public function show(Post $post)
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $post = Post::create([
+            'title' => $request->title,
+            'content' => $request->get('content'),
+            'user_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('posts.show', $post)->with('success', 'Post created successfully.');
     }
     /**
      * Show the form for editing the specified resource.
