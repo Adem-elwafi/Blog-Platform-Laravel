@@ -11,12 +11,16 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
+// In app/Http/Controllers/PostController.php
 public function index()
 {
-    $posts = Post::with('user')->latest()->get();
+    // Use paginate() instead of get() or all()
+    $posts = Post::with(['user', 'comments', 'likes'])
+                ->latest()
+                ->paginate(12); // or whatever number you prefer
+    
     return view('posts.index', compact('posts'));
 }
-
 public function create()
 {
     return view('posts.create');
@@ -89,5 +93,6 @@ public function show(Post $post)
 
             return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
         }
+        
 
 }

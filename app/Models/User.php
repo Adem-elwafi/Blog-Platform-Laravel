@@ -50,11 +50,17 @@ class User extends Authenticatable
     }
 
 
-public function likes()
-{
-    return $this->hasMany(Like::class);
-}
 
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    // Add this method if you want to count user's likes too
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
 
 
 }

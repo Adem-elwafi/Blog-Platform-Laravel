@@ -15,10 +15,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        
         <div class="flex flex-col min-h-screen">
             <!-- Navigation -->
             @include('layouts.navigation')
-
+ 
             <!-- Flash Messages -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
                 @if ($message = Session::get('success'))
@@ -27,7 +28,9 @@
                             <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            <span>{{ $message }}</span>
+                            <span>{{ $message }}
+                                
+                            </span>
                         </div>
                         <button onclick="this.parentElement.style.display='none';" class="text-green-800 dark:text-green-200">×</button>
                     </div>
@@ -41,6 +44,7 @@
                             </svg>
                             <span>{{ $message }}</span>
                         </div>
+                        
                         <button onclick="this.parentElement.style.display='none';" class="text-red-800 dark:text-red-200">×</button>
                     </div>
                 @endif
@@ -87,4 +91,5 @@
             </footer>
         </div>
     </body>
+    
 </html>

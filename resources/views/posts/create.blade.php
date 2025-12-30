@@ -1,18 +1,338 @@
 <x-app-layout>
-    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold mb-4">Create Post</h1>
+    <div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Back Navigation -->
+            <div class="mb-8">
+                <a href="{{ route('posts.index') }}" 
+                   class="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group">
+                    <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Posts
+                </a>
+            </div>
 
-        <form method="POST" action="{{ route('posts.store') }}">
-            @csrf
-            <div class="mb-4">
-                <label class="block text-gray-700">Title</label>
-                <input type="text" name="title" class="w-full border rounded px-3 py-2" required>
+            <!-- Hero Header -->
+            <div class="mb-10 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 mb-6">
+                    <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                    Craft Your
+                    <span class="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">Story</span>
+                </h1>
+                <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                    Share your thoughts, ideas, and experiences with our community
+                </p>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Content</label>
-                <textarea name="content" class="w-full border rounded px-3 py-2" rows="5" required></textarea>
+
+            <!-- Main Form Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <form method="POST" action="{{ route('posts.store') }}" class="p-6 md:p-8" id="createPostForm">
+                    @csrf
+
+                    <!-- Title Section -->
+                    <div class="mb-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="block text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Post Title
+                            </label>
+                            <span class="text-xs text-gray-500 dark:text-gray-400" id="titleCounter">0/120</span>
+                        </div>
+                        <div class="relative">
+                            <input type="text" 
+                                   name="title" 
+                                   id="title"
+                                   maxlength="120"
+                                   required
+                                   placeholder="What's on your mind? Give it a catchy title..."
+                                   class="w-full px-6 py-4 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all duration-200"
+                                   oninput="updateTitleCounter()">
+                            @error('title')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            Make it descriptive and attention-grabbing
+                        </p>
+                    </div>
+
+                    <!-- Content Section -->
+                    <div class="mb-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="block text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Your Story
+                            </label>
+                            <span class="text-xs text-gray-500 dark:text-gray-400" id="contentCounter">0/5000</span>
+                        </div>
+                        <div class="relative">
+                            <textarea 
+                                name="content" 
+                                id="content"
+                                rows="10"
+                                maxlength="5000"
+                                required
+                                placeholder="Share your thoughts, experiences, or expertise. What do you want to tell the world?"
+                                class="w-full px-6 py-4 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-base text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 resize-none"
+                                oninput="updateContentCounter()"></textarea>
+                            @error('content')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            Be authentic and engaging. Your story matters!
+                        </p>
+                    </div>
+
+                    <!-- Category Selection (Optional Enhancement) -->
+                    <div class="mb-10">
+                        <label class="block text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            Category (Optional)
+                        </label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            @php
+                                $categories = ['Technology', 'Lifestyle', 'Education', 'Business', 'Health', 'Entertainment', 'Travel', 'Other'];
+                            @endphp
+                            @foreach($categories as $category)
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="category" value="{{ $category }}" class="sr-only peer">
+                                    <div class="px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-center font-medium transition-all duration-200 peer-checked:bg-gradient-to-r peer-checked:from-purple-500 peer-checked:to-pink-500 peer-checked:text-white peer-checked:shadow-lg">
+                                        {{ $category }}
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-gray-200 dark:border-gray-700">
+                        <!-- Draft Option -->
+                        <div class="flex items-center">
+                            <input type="checkbox" 
+                                   id="saveDraft" 
+                                   name="draft"
+                                   class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2">
+                            <label for="saveDraft" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                Save as draft
+                            </label>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <button type="button" 
+                                    onclick="window.location.href='{{ route('posts.index') }}'"
+                                    class="px-8 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-xl font-semibold transition-colors duration-200">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    id="submitBtn"
+                                    class="group relative px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 overflow-hidden">
+                                <!-- Animated Background -->
+                                <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-green-600 to-emerald-700 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                                
+                                <!-- Button Content -->
+                                <span class="relative flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                    </svg>
+                                    <span id="submitText">Publish Post</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Publish</button>
-        </form>
+
+            <!-- Writing Tips -->
+            <div class="mt-8 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-100 dark:border-blue-800 rounded-2xl p-6">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="w-6 h-6 text-blue-500 dark:text-blue-400 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Writing Tips</h3>
+                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            <li class="flex items-start">
+                                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Start with a compelling headline</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Use clear paragraphs and headings</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Add value and be authentic</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Proofread before publishing</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- JavaScript for Character Counters -->
+    <script>
+        function updateTitleCounter() {
+            const titleInput = document.getElementById('title');
+            const counter = document.getElementById('titleCounter');
+            const length = titleInput.value.length;
+            const maxLength = 120;
+            
+            counter.textContent = `${length}/${maxLength}`;
+            
+            if (length > maxLength * 0.8) {
+                counter.classList.remove('text-gray-500', 'dark:text-gray-400');
+                counter.classList.add('text-yellow-500');
+            } else {
+                counter.classList.remove('text-yellow-500');
+                counter.classList.add('text-gray-500', 'dark:text-gray-400');
+            }
+        }
+
+        function updateContentCounter() {
+            const contentInput = document.getElementById('content');
+            const counter = document.getElementById('contentCounter');
+            const length = contentInput.value.length;
+            const maxLength = 5000;
+            
+            counter.textContent = `${length}/${maxLength}`;
+            
+            if (length > maxLength * 0.9) {
+                counter.classList.remove('text-gray-500', 'dark:text-gray-400');
+                counter.classList.add('text-red-500');
+            } else if (length > maxLength * 0.75) {
+                counter.classList.remove('text-gray-500', 'dark:text-gray-400', 'text-red-500');
+                counter.classList.add('text-yellow-500');
+            } else {
+                counter.classList.remove('text-yellow-500', 'text-red-500');
+                counter.classList.add('text-gray-500', 'dark:text-gray-400');
+            }
+        }
+
+        // Initialize counters
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTitleCounter();
+            updateContentCounter();
+
+            // Handle draft checkbox
+            const draftCheckbox = document.getElementById('saveDraft');
+            const submitText = document.getElementById('submitText');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            draftCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    submitText.textContent = 'Save as Draft';
+                    submitBtn.classList.remove('from-green-500', 'to-emerald-600', 'hover:from-green-600', 'hover:to-emerald-700');
+                    submitBtn.classList.add('from-gray-500', 'to-gray-600', 'hover:from-gray-600', 'hover:to-gray-700');
+                } else {
+                    submitText.textContent = 'Publish Post';
+                    submitBtn.classList.remove('from-gray-500', 'to-gray-600', 'hover:from-gray-600', 'hover:to-gray-700');
+                    submitBtn.classList.add('from-green-500', 'to-emerald-600', 'hover:from-green-600', 'hover:to-emerald-700');
+                }
+            });
+
+            // Form validation
+            const form = document.getElementById('createPostForm');
+            form.addEventListener('submit', function(e) {
+                const title = document.getElementById('title').value.trim();
+                const content = document.getElementById('content').value.trim();
+                
+                if (!title || !content) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+                
+                // Show loading state
+                const btn = document.getElementById('submitBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `
+                    <span class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                    </span>
+                `;
+                btn.disabled = true;
+            });
+        });
+    </script>
+
+    <style>
+        /* Custom scrollbar for textarea */
+        textarea {
+            scrollbar-width: thin;
+            scrollbar-color: #CBD5E0 transparent;
+        }
+        
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        textarea::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 4px;
+        }
+        
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #CBD5E0;
+            border-radius: 4px;
+        }
+        
+        textarea.dark::-webkit-scrollbar-thumb {
+            background-color: #4B5563;
+        }
+        
+        /* Focus styles */
+        input:focus, textarea:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .dark input:focus, .dark textarea:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+        
+        /* Smooth transitions */
+        * {
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+    </style>
 </x-app-layout>
