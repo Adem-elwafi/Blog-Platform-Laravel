@@ -106,6 +106,13 @@ A modern, feature-rich blog platform built with Laravel, Tailwind CSS, and GSAP 
 
 ## 📸 Screenshots
 
+### Welcome Page
+![Welcome Page](./screenshots/welcome.png)
+- Hero section with call-to-action
+- Feature highlights
+- Login/Register buttons
+- Responsive hero banner
+
 ### Home Page / Posts Index
 ![Posts Index](./screenshots/posts-index.png)
 - Responsive grid layout with post cards
