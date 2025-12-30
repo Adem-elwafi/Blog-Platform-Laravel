@@ -107,14 +107,14 @@ A modern, feature-rich blog platform built with Laravel, Tailwind CSS, and GSAP 
 ## 📸 Screenshots
 
 ### Home Page / Posts Index
-![Posts Index](https://via.placeholder.com/1200x600?text=Posts+Index+Page)
+![Posts Index](./screenshots/posts-index.png)
 - Responsive grid layout with post cards
 - Post statistics (comments, likes, views)
 - "Read More" button for each post
 - Featured post badge
 
 ### Post Detail Page
-![Post Show](https://via.placeholder.com/1200x600?text=Post+Detail+Page)
+![Post Show](./screenshots/post-detail.png)
 - Full post content display
 - Author information with timestamp
 - Like/Unlike button with count
@@ -122,20 +122,20 @@ A modern, feature-rich blog platform built with Laravel, Tailwind CSS, and GSAP 
 - Comments section with form
 
 ### Comments Section
-![Comments](https://via.placeholder.com/1200x600?text=Comments+Section)
+![Comments](./screenshots/comments-section.png)
 - Comment form for authenticated users
 - Comment list with author avatars
 - Delete option for comment owners/admins
 - Relative time display (e.g., "2 hours ago")
 
 ### Dark Mode
-![Dark Mode](https://via.placeholder.com/1200x600?text=Dark+Mode+Theme)
+![Dark Mode](./screenshots/dark-mode.png)
 - Seamless dark theme support
 - High contrast for readability
 - Consistent styling across all pages
 
 ### Mobile Responsive
-![Mobile View](https://via.placeholder.com/600x800?text=Mobile+Responsive)
+![Mobile View](./screenshots/mobile-responsive.png)
 - Optimized for mobile devices
 - Touch-friendly buttons
 - Stacked layout for smaller screens
