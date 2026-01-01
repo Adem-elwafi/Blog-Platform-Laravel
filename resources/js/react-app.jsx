@@ -1,22 +1,23 @@
 /**
  * React Application Entry Point
  * 
- * This file is the main entry point for React components.
- * It prepares React for use but does NOT mount anything yet.
- * 
- * React components will be mounted into specific Blade views
+ * This file mounts React components into Blade-provided containers
  * as "islands" where interactivity is needed.
  */
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { mountComponents } from './utils/mountComponents';
 
 /**
- * Export utilities for mounting React components from Blade views
+ * Mount all React components when DOM is ready
  */
-export { React, createRoot };
+document.addEventListener('DOMContentLoaded', () => {
+  mountComponents();
+  console.log('✅ React components mounted');
+});
 
 /**
- * Console confirmation that React is loaded and ready
+ * Export utilities for use in other modules
  */
-console.log('✅ React loaded and ready for component mounting');
+export { React, createRoot, mountComponents };

@@ -41,33 +41,16 @@
         <!-- Post Actions -->
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Like Button -->
+                <!-- React Like Button Island -->
                 <div>
-                    @auth
-                        <form method="POST" action="{{ route('posts.like', $post) }}" class="inline">
-                            @csrf
-                            <button type="submit" 
-                                class="flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition {{ auth()->user()->likes()->where('post_id', $post->id)->exists() ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white' }}"
-                                aria-label="{{ auth()->user()->likes()->where('post_id', $post->id)->exists() ? 'Unlike' : 'Like' }} this post">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
-                                </svg>
-                                <span>
-                                    {{ auth()->user()->likes()->where('post_id', $post->id)->exists() ? 'Unlike' : 'Like' }}
-                                </span>
-                                <span class="text-sm bg-opacity-20 px-2 py-1 rounded">
-                                    {{ $post->likes()->count() }}
-                                </span>
-                            </button>
-                        </form>
-                    @else
-                        <div class="flex items-center space-x-2 px-6 py-3 bg-gray-200 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                            <span>{{ $post->likes()->count() }} Likes</span>
-                        </div>
-                    @endauth
+                    <div 
+                        id="react-like-button-{{ $post->id }}"
+                        data-component="LikeButton"
+                        data-post-id="{{ $post->id }}"
+                        data-initial-liked="{{ auth()->check() && auth()->user()->likes()->where('post_id', $post->id)->exists() ? 'true' : 'false' }}"
+                        data-initial-likes-count="{{ $post->likes()->count() }}"
+                        data-is-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
+                    ></div>
                 </div>
 
                 <!-- Edit/Delete Actions -->
