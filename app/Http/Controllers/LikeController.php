@@ -23,13 +23,24 @@ public function toggle(Post $post)
 
     if ($existingLike) {
         $existingLike->delete();
+        $liked = false;
     } else {
         Like::create([
             'user_id' => $user->id,
             'post_id' => $post->id,
         ]);
+        $liked = true;
     }
 
+    // 👇 NEW PART (for React)
+    if (request()->expectsJson()) {
+        return response()->json([
+            'liked' => $liked,
+            'likes_count' => $post->likes()->count(),
+        ]);
+    }
+
+    // 👇 Old behavior stays
     return back();
 }
 
