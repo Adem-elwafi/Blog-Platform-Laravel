@@ -120,256 +120,424 @@
                 background-size: cover;
                 background-position: center;
             }
-            
-            @keyframes float {
-                0%, 100% {
-                    transform: translate(0, 0) rotate(0deg);
-                }
-                33% {
-                    transform: translate(30px, -20px) rotate(120deg);
-                }
-                66% {
-                    transform: translate(-20px, 20px) rotate(240deg);
-                }
-            }
-            
-            /* For mobile devices, disable fixed background */
-            @media (max-width: 768px) {
-                .hero-bg,
-                .features-bg,
-                .cta-bg {
-                    background-attachment: scroll;
-                }
-                
-                .cta-bg::before {
-                    animation: float-mobile 20s infinite ease-in-out;
-                }
-            }
-            
-            @keyframes float-mobile {
-                0%, 100% {
-                    transform: translate(0, 0);
-                }
-                50% {
-                    transform: translate(10px, 10px);
-                }
-            }
-            
-            /* Glass morphism effect for cards */
-            .glass-card {
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-            
-            .dark .glass-card {
-                background: rgba(0, 0, 0, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            /* Loading fallback for animations */
-            .js-loading [data-animate] {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+    
         </style>
         
-        <!-- Animation Script in Head -->
-        <script>
-            // Add loading class to body initially
-            document.addEventListener('DOMContentLoaded', function() {
-                document.body.classList.add('js-loading');
-                
-                // Register ScrollTrigger plugin
-                if (typeof ScrollTrigger !== 'undefined') {
-                    gsap.registerPlugin(ScrollTrigger);
-                }
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Register plugins
+        if (typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+        }
 
-                // Check if user prefers reduced motion
-                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                
-                if (prefersReducedMotion) {
-                    // Show all elements immediately without animation
-                    document.querySelectorAll('[data-animate]').forEach(el => {
-                        el.style.opacity = '1';
-                        el.style.transform = 'none';
-                    });
-                    document.body.classList.remove('js-loading');
-                    return;
-                }
-
-                // Initial page load animations
-                const animateElements = (selector, animation, delay = 0) => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach((el, index) => {
-                        const elementDelay = parseFloat(el.getAttribute('data-delay')) || delay + (index * 0.1);
-                        
-                        switch(animation) {
-                            case 'fade-in':
-                                gsap.fromTo(el, 
-                                    { opacity: 0 },
-                                    {
-                                        opacity: 1,
-                                        duration: 0.8,
-                                        delay: elementDelay,
-                                        ease: "power2.out"
-                                    }
-                                );
-                                break;
-                                
-                            case 'slide-up':
-                                gsap.fromTo(el, 
-                                    { opacity: 0, y: 30 },
-                                    {
-                                        opacity: 1,
-                                        y: 0,
-                                        duration: 0.8,
-                                        delay: elementDelay,
-                                        ease: "power2.out"
-                                    }
-                                );
-                                break;
-                                
-                            case 'slide-left':
-                                gsap.fromTo(el, 
-                                    { opacity: 0, x: -30 },
-                                    {
-                                        opacity: 1,
-                                        x: 0,
-                                        duration: 0.8,
-                                        delay: elementDelay,
-                                        ease: "power2.out"
-                                    }
-                                );
-                                break;
-                                
-                            case 'scale-in':
-                                gsap.fromTo(el, 
-                                    { opacity: 0, scale: 0.95 },
-                                    {
-                                        opacity: 1,
-                                        scale: 1,
-                                        duration: 0.8,
-                                        delay: elementDelay,
-                                        ease: "back.out(1.7)"
-                                    }
-                                );
-                                break;
-                        }
-                    });
-                };
-
-                // Remove loading class and start animations
-                setTimeout(() => {
-                    document.body.classList.remove('js-loading');
-                    
-                    // Animate navigation first
-                    animateElements('[data-animate="fade-in"]:not([data-delay])', 'fade-in', 0);
-                    animateElements('[data-animate="slide-left"]', 'slide-left', 0.2);
-                    animateElements('[data-animate="scale-in"]', 'scale-in', 0.3);
-
-                    // Animate hero section with a slight delay
-                    setTimeout(() => {
-                        animateElements('h1[data-animate="slide-up"]', 'slide-up', 0);
-                        animateElements('p[data-animate="slide-up"]', 'slide-up', 0.2);
-                        animateElements('div[data-animate="scale-in"]', 'scale-in', 0.4);
-                    }, 300);
-
-                    // Animate features on scroll if ScrollTrigger is available
-                    if (typeof ScrollTrigger !== 'undefined') {
-                        // Features section animations
-                        const features = document.querySelectorAll('.card-hover[data-animate="slide-up"]');
-                        features.forEach(feature => {
-                            const delay = parseFloat(feature.getAttribute('data-delay')) || 0;
-                            
-                            gsap.fromTo(feature, 
-                                {
-                                    opacity: 0,
-                                    y: 50
-                                },
-                                {
-                                    opacity: 1,
-                                    y: 0,
-                                    duration: 0.8,
-                                    delay: delay,
-                                    ease: "power2.out",
-                                    scrollTrigger: {
-                                        trigger: feature,
-                                        start: "top 85%",
-                                        toggleActions: "play none none none"
-                                    }
-                                }
-                            );
-                        });
-
-                        // CTA section animations
-                        const ctaElements = document.querySelectorAll('.cta-bg [data-animate]');
-                        ctaElements.forEach(el => {
-                            const animationType = el.getAttribute('data-animate');
-                            const delay = parseFloat(el.getAttribute('data-delay')) || 0;
-                            
-                            let fromVars = { opacity: 0 };
-                            if (animationType === 'slide-up') fromVars.y = 30;
-                            if (animationType === 'scale-in') fromVars.scale = 0.95;
-                            
-                            gsap.fromTo(el, 
-                                fromVars,
-                                {
-                                    opacity: 1,
-                                    y: 0,
-                                    scale: 1,
-                                    duration: 0.8,
-                                    delay: delay,
-                                    ease: "power2.out",
-                                    scrollTrigger: {
-                                        trigger: el,
-                                        start: "top 80%",
-                                        toggleActions: "play none none none"
-                                    }
-                                }
-                            );
-                        });
-                    } else {
-                        // Fallback animation if ScrollTrigger not available
-                        setTimeout(() => {
-                            animateElements('.card-hover[data-animate="slide-up"]', 'slide-up', 0);
-                            animateElements('.cta-bg [data-animate]', 'slide-up', 0.2);
-                        }, 600);
-                    }
-
-                    // Add subtle floating animation to hero icon
-                    const heroIcon = document.querySelector('.inline-flex.w-20.h-20');
-                    if (heroIcon) {
-                        gsap.to(heroIcon, {
-                            y: -5,
-                            duration: 2,
-                            repeat: -1,
-                            yoyo: true,
-                            ease: "sine.inOut"
-                        });
-                    }
-
-                    // Add hover effect to cards
-                    document.querySelectorAll('.card-hover').forEach(card => {
-                        card.addEventListener('mouseenter', () => {
-                            gsap.to(card, {
-                                y: -8,
-                                duration: 0.3,
-                                ease: "power2.out"
-                            });
-                        });
-                        
-                        card.addEventListener('mouseleave', () => {
-                            gsap.to(card, {
-                                y: 0,
-                                duration: 0.3,
-                                ease: "power2.out"
-                            });
-                        });
-                    });
-                }, 100);
+        // Check for reduced motion preference
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        if (prefersReducedMotion) {
+            document.querySelectorAll('[data-animate]').forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
             });
-        </script>
+            return;
+        }
+
+        // Improved animation function with smoother easing
+        const animateElements = (selector, animation, delay = 0) => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach((el, index) => {
+                const elementDelay = parseFloat(el.getAttribute('data-delay')) || delay + (index * 0.08); // Reduced stagger
+                
+                switch(animation) {
+                    case 'fade-in':
+                        gsap.fromTo(el, 
+                            { 
+                                opacity: 0,
+                                scale: 0.98 
+                            },
+                            {
+                                opacity: 1,
+                                scale: 1,
+                                duration: 1.2,
+                                delay: elementDelay,
+                                ease: "expo.out"
+                            }
+                        );
+                        break;
+                        
+                    case 'slide-up':
+                        gsap.fromTo(el, 
+                            { 
+                                opacity: 0, 
+                                y: 40,
+                                scale: 0.95
+                            },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                scale: 1,
+                                duration: 1.2,
+                                delay: elementDelay,
+                                ease: "expo.out"
+                            }
+                        );
+                        break;
+                        
+                    case 'slide-left':
+                        gsap.fromTo(el, 
+                            { 
+                                opacity: 0, 
+                                x: -40,
+                                skewX: 2
+                            },
+                            {
+                                opacity: 1,
+                                x: 0,
+                                skewX: 0,
+                                duration: 1.2,
+                                delay: elementDelay,
+                                ease: "expo.out"
+                            }
+                        );
+                        break;
+                        
+                    case 'scale-in':
+                        gsap.fromTo(el, 
+                            { 
+                                opacity: 0, 
+                                scale: 0.85,
+                                rotation: -2
+                            },
+                            {
+                                opacity: 1,
+                                scale: 1,
+                                rotation: 0,
+                                duration: 1.2,
+                                delay: elementDelay,
+                                ease: "back.out(1.4)"
+                            }
+                        );
+                        break;
+                        
+                    case 'blur-in':
+                        gsap.fromTo(el, 
+                            { 
+                                opacity: 0, 
+                                filter: "blur(10px)",
+                                y: 20
+                            },
+                            {
+                                opacity: 1,
+                                filter: "blur(0px)",
+                                y: 0,
+                                duration: 1.4,
+                                delay: elementDelay,
+                                ease: "expo.out"
+                            }
+                        );
+                        break;
+                        
+                    case 'rotate-in':
+                        gsap.fromTo(el, 
+                            { 
+                                opacity: 0, 
+                                rotationY: -10,
+                                scale: 0.9
+                            },
+                            {
+                                opacity: 1,
+                                rotationY: 0,
+                                scale: 1,
+                                duration: 1.4,
+                                delay: elementDelay,
+                                ease: "expo.out"
+                            }
+                        );
+                        break;
+                }
+            });
+        };
+
+        // Master timeline for sequenced animations
+        const masterTimeline = gsap.timeline();
+
+        // Animate navigation first
+        masterTimeline
+            .to(document.body, {
+                opacity: 1,
+                duration: 0.5
+            })
+            .add(() => {
+                animateElements('[data-animate="fade-in"]:not([data-delay])', 'fade-in', 0);
+            }, "+=0.2")
+            .add(() => {
+                animateElements('[data-animate="slide-left"]', 'slide-left', 0.1);
+            }, "+=0.1")
+            .add(() => {
+                animateElements('[data-animate="scale-in"]', 'scale-in', 0.2);
+            }, "+=0.1");
+
+        // Hero section with parallax effect
+        const heroSection = document.querySelector('.bg-gradient-to-br');
+        if (heroSection) {
+            const heroContent = heroSection.querySelectorAll('[data-animate]');
+            
+            masterTimeline
+                .add(() => {
+                    gsap.fromTo(heroContent,
+                        { 
+                            opacity: 0,
+                            y: 60,
+                            scale: 0.95
+                        },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            duration: 1.6,
+                            stagger: 0.1,
+                            ease: "expo.out"
+                        }
+                    );
+                }, "-=0.5");
+
+            // Smooth parallax effect on hero section
+            gsap.to(heroSection, {
+                backgroundPosition: '50% 20%',
+                ease: "none",
+                scrollTrigger: {
+                    trigger: heroSection,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        }
+
+        // Enhanced card animations with ScrollTrigger
+        if (typeof ScrollTrigger !== 'undefined') {
+            // Features section with staggered reveal
+            const features = document.querySelectorAll('.card-hover[data-animate="slide-up"]');
+            features.forEach((feature, index) => {
+                gsap.fromTo(feature, 
+                    {
+                        opacity: 0,
+                        y: 80,
+                        rotationX: 5,
+                        scale: 0.95
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        rotationX: 0,
+                        scale: 1,
+                        duration: 1.4,
+                        delay: index * 0.1,
+                        ease: "expo.out",
+                        scrollTrigger: {
+                            trigger: feature,
+                            start: "top 90%",
+                            end: "top 60%",
+                            toggleActions: "play none none reverse",
+                            once: true
+                        }
+                    }
+                );
+            });
+
+            // CTA section with special entrance
+            const ctaSection = document.querySelector('.cta-bg');
+            if (ctaSection) {
+                const ctaElements = ctaSection.querySelectorAll('[data-animate]');
+                
+                gsap.fromTo(ctaElements,
+                    {
+                        opacity: 0,
+                        y: 60,
+                        scale: 0.9
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 1.6,
+                        stagger: 0.15,
+                        ease: "expo.out",
+                        scrollTrigger: {
+                            trigger: ctaSection,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                            once: true
+                        }
+                    }
+                );
+            }
+
+            // Add subtle scale to sections on scroll
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                gsap.fromTo(section,
+                    {
+                        scale: 0.99
+                    },
+                    {
+                        scale: 1,
+                        duration: 2,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 80%",
+                            end: "bottom 20%",
+                            scrub: 1
+                        }
+                    }
+                );
+            });
+        }
+
+        // Enhanced hero icon animation
+        const heroIcon = document.querySelector('.inline-flex.w-20.h-20');
+        if (heroIcon) {
+            gsap.to(heroIcon, {
+                y: -10,
+                rotation: 2,
+                duration: 3,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+            
+            // Add glow effect
+            gsap.to(heroIcon, {
+                boxShadow: "0 0 30px rgba(59, 130, 246, 0.5)",
+                duration: 2,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        }
+
+        // Enhanced card hover effects with 3D-like transformation
+        document.querySelectorAll('.card-hover').forEach(card => {
+            // Initial state
+            gsap.set(card, {
+                transformPerspective: 1000
+            });
+
+            card.addEventListener('mouseenter', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const rotateY = ((x / rect.width) - 0.5) * 10;
+                const rotateX = ((y / rect.height) - 0.5) * -10;
+                
+                gsap.to(card, {
+                    duration: 0.4,
+                    y: -12,
+                    rotationX: rotateX,
+                    rotationY: rotateY,
+                    scale: 1.03,
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                    ease: "power2.out"
+                });
+                
+                // Add shine effect
+                const shine = document.createElement('div');
+                shine.style.position = 'absolute';
+                shine.style.inset = '0';
+                shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3) 0%, transparent 80%)`;
+                shine.style.pointerEvents = 'none';
+                shine.style.zIndex = '1';
+                shine.style.opacity = '0';
+                card.appendChild(shine);
+                
+                gsap.to(shine, {
+                    opacity: 1,
+                    duration: 0.3,
+                    onComplete: () => {
+                        gsap.to(shine, {
+                            opacity: 0,
+                            duration: 0.3,
+                            delay: 0.2,
+                            onComplete: () => shine.remove()
+                        });
+                    }
+                });
+            });
+            
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const rotateY = ((x / rect.width) - 0.5) * 10;
+                const rotateX = ((y / rect.height) - 0.5) * -10;
+                
+                gsap.to(card, {
+                    duration: 0.1,
+                    rotationX: rotateX,
+                    rotationY: rotateY,
+                    ease: "power1.out"
+                });
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    duration: 0.6,
+                    y: 0,
+                    rotationX: 0,
+                    rotationY: 0,
+                    scale: 1,
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                    ease: "elastic.out(1, 0.5)"
+                });
+            });
+        });
+
+        // Add micro-interactions to buttons
+        document.querySelectorAll('button, a[href^="#"]').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                gsap.to(button, {
+                    duration: 0.1,
+                    scale: 0.95,
+                    ease: "power2.in"
+                });
+            });
+            
+            button.addEventListener('mouseup', () => {
+                gsap.to(button, {
+                    duration: 0.3,
+                    scale: 1,
+                    ease: "elastic.out(1, 0.5)"
+                });
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                gsap.to(button, {
+                    duration: 0.2,
+                    scale: 1,
+                    ease: "power2.out"
+                });
+            });
+        });
+
+        // Page transition effect on load
+        const pageTransition = gsap.timeline();
+        pageTransition
+            .fromTo('body',
+                {
+                    opacity: 0,
+                    filter: "blur(10px)"
+                },
+                {
+                    opacity: 1,
+                    filter: "blur(0px)",
+                    duration: 1.2,
+                    ease: "expo.out"
+                }
+            );
+    });
+</script>
     </head>
     <body class="font-sans antialiased text-gray-900 dark:text-gray-100">
         <div class="flex flex-col min-h-screen">

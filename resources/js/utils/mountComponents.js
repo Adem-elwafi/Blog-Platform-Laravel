@@ -1,45 +1,47 @@
+import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 
-/**
- * Mount a React component into a Blade-provided DOM node
- * 
- * Usage in Blade:
- * <div 
- *   id="react-like-button-123"
- *   data-component="LikeButton"
- *   data-post-id="123"
- *   data-initial-liked="true"
- *   data-initial-likes-count="42"
- * ></div>
- */
+// ✅ STATIC imports (this is the key)
+import LikeButton from '../components/LikeButton.jsx';
+
+const components = {
+  LikeButton,
+};
+
+// Store roots to prevent duplicate creation
+const roots = new Map();
+
 export function mountComponents() {
-  // Find all elements that should have React components
-  const elements = document.querySelectorAll('[data-component]');
+  document.querySelectorAll('[data-component]').forEach((el) => {
+    // Skip if already mounted
+    if (roots.has(el)) {
+      return;
+    }
 
-  elements.forEach((element) => {
-    const componentName = element.dataset.component;
-    
-    // Dynamically import the component
-    import(`../components/${componentName}.jsx`).then((module) => {
-      const Component = module.default;
+    const name = el.dataset.component;
+    const Component = components[name];
 
-      // Extract all data-* attributes and convert to props
-      const props = Object.entries(element.dataset).reduce((acc, [key, value]) => {
-        if (key === 'component') return acc; // Skip component name itself
+    if (!Component) {
+      console.warn(`React component "${name}" not found`);
+      return;
+    }
 
-        // Convert camelCase data attributes to proper types
-        if (value === 'true') return { ...acc, [key]: true };
-        if (value === 'false') return { ...acc, [key]: false };
-        if (!isNaN(value)) return { ...acc, [key]: Number(value) };
-        return { ...acc, [key]: value };
-      }, {});
+    const props = {};
+    for (const [key, value] of Object.entries(el.dataset)) {
+      if (key === 'component') continue;
 
-      // Mount the component using React's createRoot
-      const root = createRoot(element);
-      const React = require('react');
-      root.render(React.createElement(Component, props));
-    }).catch((error) => {
-      console.error(`Failed to load component ${componentName}:`, error);
-    });
+      props[key] =
+        value === 'true'
+          ? true
+          : value === 'false'
+          ? false
+          : isNaN(value)
+          ? value
+          : Number(value);
+    }
+
+    const root = createRoot(el);
+    root.render(createElement(Component, props));
+    roots.set(el, root);
   });
 }
