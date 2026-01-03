@@ -1,47 +1,45 @@
-import { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+// resources/js/utils/mountComponents.js
+import LikeButton from '../components/LikeButton';
+import Comments from '../components/Comments';
 
-// ✅ STATIC imports (this is the key)
-import LikeButton from '../components/LikeButton.jsx';
-
-const components = {
+const componentMap = {
   LikeButton,
+  Comments,
 };
 
-// Store roots to prevent duplicate creation
-const roots = new Map();
+function parseProps(element) {
+  const props = {};
+  for (let attr of element.attributes) {
+    if (attr.name.startsWith('data-')) {
+      const propName = attr.name.substring(5); // Remove 'data-' prefix
+      let value = attr.value;
+
+      // Handle JSON props that need parsing
+      if (propName === 'initialComments' || propName === 'user') {
+        try {
+          value = JSON.parse(value);
+        } catch (e) {
+          console.warn(`Failed to parse JSON prop: ${propName}`, e);
+          value = null;
+        }
+      } else if (propName === 'postId') {
+        // Convert postId to number
+        value = parseInt(value, 10);
+      }
+
+      props[propName] = value;
+    }
+  }
+  return props;
+}
 
 export function mountComponents() {
-  document.querySelectorAll('[data-component]').forEach((el) => {
-    // Skip if already mounted
-    if (roots.has(el)) {
-      return;
-    }
-
-    const name = el.dataset.component;
-    const Component = components[name];
-
-    if (!Component) {
-      console.warn(`React component "${name}" not found`);
-      return;
-    }
-
-    const props = {};
-    for (const [key, value] of Object.entries(el.dataset)) {
-      if (key === 'component') continue;
-
-      props[key] =
-        value === 'true'
-          ? true
-          : value === 'false'
-          ? false
-          : isNaN(value)
-          ? value
-          : Number(value);
-    }
-
-    const root = createRoot(el);
-    root.render(createElement(Component, props));
-    roots.set(el, root);
+  Object.keys(componentMap).forEach(componentName => {
+    const elements = document.querySelectorAll(`[data-component="${componentName}"]`);
+    elements.forEach(element => {
+      const props = parseProps(element);
+      const Component = componentMap[componentName];
+      ReactDOM.render(<Component {...props} />, element);
+    });
   });
 }
