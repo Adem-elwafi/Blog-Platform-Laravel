@@ -78,100 +78,11 @@
             </div>
         </div>
 
-        <!-- Comments Section -->
-        <section class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Comments <span class="text-gray-600 dark:text-gray-400">({{ $post->comments()->count() }})</span>
-            </h2>
-
-            <!-- Comment Form -->
-            @auth
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Leave a Comment</h3>
-                    <form method="POST" action="{{ route('posts.comments.store', $post) }}">
-                        @csrf
-                        <div class="mb-4">
-                            <textarea name="body" 
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
-                                rows="4" 
-                                placeholder="Share your thoughts..." 
-                                required
-                                aria-label="Comment body"></textarea>
-                            @error('body')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg font-semibold transition">
-                            Post Comment
-                        </button>
-                    </form>
-                </div>
-            @else
-                <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-6 mb-8">
-                    <p class="text-blue-800 dark:text-blue-200">
-                        <a href="{{ route('login') }}" class="font-semibold hover:underline">Sign in</a> to leave a comment.
-                    </p>
-                </div>
-            @endauth
-
-            <!-- Comments List -->
-            @if($post->comments()->count() > 0)
-                <div class="space-y-4">
-                    @foreach($post->comments as $comment)
-                        <article class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-                            <!-- Comment Header -->
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="flex items-center space-x-3">
-                                    <div class="h-10 w-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                        {{ substr($comment->user->name, 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900 dark:text-white">{{ $comment->user->name }}</p>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400">
-                                            {{ $comment->created_at->diffForHumans() }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Comment Body -->
-                            <p class="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
-                                {{ $comment->body }}
-                            </p>
-
-                            <!-- Comment Actions -->
-                            @if(Auth::id() === $comment->user_id || Auth::user()?->role === 'admin')
-                                <div class="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                    <form method="POST" action="{{ route('comments.destroy', $comment) }}" onsubmit="return confirm('Delete this comment?');" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            @endif
-                        </article>
-                    @endforeach
-                </div>
-            @else
-                <div class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                    </svg>
-                    <p class="mt-4 text-gray-600 dark:text-gray-400">No comments yet. Be the first to comment!</p>
-                </div>
-            @endif
-        </section>
-
-        <!-- Back to Posts Link -->
-        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <a href="{{ route('posts.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-semibold transition">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Back to Posts
-            </a>
-        </div>
-    </article>
+            <!-- Comments Section will be handled by React -->
+        <div id="comments-root"
+            data-post-id="{{ $post->id }}"
+            data-user='@json(auth()->user())'
+            data-comments='@json($post->comments->load("user"))'
+            data-csrf-token="{{ csrf_token() }}"
+        ></div>
 </x-app-layout>
