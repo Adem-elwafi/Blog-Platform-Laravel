@@ -1,4 +1,6 @@
 // resources/js/utils/mountComponents.js
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import LikeButton from '../components/LikeButton';
 import Comments from '../components/Comments';
 
@@ -11,7 +13,11 @@ function parseProps(element) {
   const props = {};
   for (let attr of element.attributes) {
     if (attr.name.startsWith('data-')) {
-      const propName = attr.name.substring(5); // Remove 'data-' prefix
+      // Remove 'data-' prefix and convert to camelCase
+      const propName = attr.name
+        .substring(5)
+        .replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+      
       let value = attr.value;
 
       // Handle JSON props that need parsing
@@ -39,7 +45,8 @@ export function mountComponents() {
     elements.forEach(element => {
       const props = parseProps(element);
       const Component = componentMap[componentName];
-      ReactDOM.render(<Component {...props} />, element);
+      const root = createRoot(element);
+      root.render(React.createElement(Component, props));
     });
   });
 }
