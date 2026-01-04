@@ -1,34 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function PostFilters({ authors = [], initialSearch = '', initialAuthor = '', initialSort = 'newest' }) {
   const [search, setSearch] = useState(initialSearch);
   const [author, setAuthor] = useState(initialAuthor);
   const [sort, setSort] = useState(initialSort);
+  const searchTimerRef = useRef(null);
 
-  // Debounce search input and apply filters after 500ms of no typing
+  // Debounce search input: only apply filters 500ms after user stops typing
   // This prevents excessive page reloads while user is actively typing
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Skip if search hasn't changed from initial value (prevents unnecessary navigation on mount)
+    if (search === initialSearch) return;
+
+    // Clear any existing timer
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
+    // Set new timer to apply search filter
+    searchTimerRef.current = setTimeout(() => {
       applyFilters(search, author, sort);
     }, 500);
 
-    // Clear timer if component unmounts or search changes again
-    return () => clearTimeout(timer);
+    // Cleanup timer on unmount or when search changes again
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
   }, [search]);
-
-  // Apply filters immediately when author dropdown changes
-  const handleAuthorChange = (e) => {
-    const newAuthor = e.target.value;
-    setAuthor(newAuthor);
-    applyFilters(search, newAuthor, sort);
-  };
-
-  // Apply filters immediately when sort dropdown changes
-  const handleSortChange = (e) => {
-    const newSort = e.target.value;
-    setSort(newSort);
-    applyFilters(search, author, newSort);
-  };
 
   // Build URL with search parameters and navigate to new filtered view
   // Uses URLSearchParams to properly encode parameters
@@ -36,16 +36,20 @@ export default function PostFilters({ authors = [], initialSearch = '', initialA
   const applyFilters = (searchTerm, authorId, sortBy) => {
     const params = new URLSearchParams();
     
-    if (searchTerm) params.append('search', searchTerm);
+    if (searchTerm && searchTerm.trim()) params.append('search', searchTerm.trim());
     if (authorId) params.append('author', authorId);
     if (sortBy && sortBy !== 'newest') params.append('sort', sortBy); // Only add sort if not default
 
-    const newUrl = params.toString() 
-      ? `/posts?${params.toString()}` 
-      : '/posts';
+    const queryString = params.toString();
+    const newUrl = queryString ? `/posts?${queryString}` : '/posts';
     
-    // Navigate to new URL (causes page reload with filtered results)
+    // Navigate to new URL (causes page reload with filtered results from backend)
     window.location.href = newUrl;
+  };
+
+  // Handle explicit Apply button click (for author and sort changes)
+  const handleApplyFilters = () => {
+    applyFilters(search, author, sort);
   };
 
   // Check if any filters are active (other than default sort)
@@ -74,7 +78,7 @@ export default function PostFilters({ authors = [], initialSearch = '', initialA
           />
         </div>
 
-        {/* Author Filter Dropdown - Immediate action */}
+        {/* Author Filter Dropdown */}
         <div>
           <label htmlFor="author" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Filter by Author
@@ -82,7 +86,7 @@ export default function PostFilters({ authors = [], initialSearch = '', initialA
           <select
             id="author"
             value={author}
-            onChange={handleAuthorChange}
+            onChange={(e) => setAuthor(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors duration-200"
           >
             <option value="">All Authors</option>
@@ -94,7 +98,7 @@ export default function PostFilters({ authors = [], initialSearch = '', initialA
           </select>
         </div>
 
-        {/* Sort Options Dropdown - Immediate action */}
+        {/* Sort Options Dropdown */}
         <div>
           <label htmlFor="sort" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Sort By
@@ -102,27 +106,36 @@ export default function PostFilters({ authors = [], initialSearch = '', initialA
           <select
             id="sort"
             value={sort}
-            onChange={handleSortChange}
+            onChange={(e) => setSort(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors duration-200"
           >
             <option value="newest">Newest First</option>
             <option value="popular">Most Popular (Likes)</option>
-            <option value="commented">Most Commented</option>
+            <option value="most_commented">Most Commented</option>
           </select>
         </div>
       </div>
 
-      {/* Clear Filters Button - Only displayed when filters are active */}
-      {hasActiveFilters && (
-        <div className="mt-4">
+      {/* Action Buttons */}
+      <div className="mt-4 flex gap-3">
+        {/* Apply Filters Button - Apply author and sort changes */}
+        <button
+          onClick={handleApplyFilters}
+          className="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 font-medium"
+        >
+          Apply Filters
+        </button>
+
+        {/* Clear Filters Button - Only displayed when filters are active */}
+        {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors duration-200 font-medium"
+            className="px-6 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors duration-200 font-medium"
           >
             Clear Filters
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
