@@ -12,13 +12,62 @@ class PostController extends Controller
      * Display a listing of the resource.
      */
 // In app/Http/Controllers/PostController.php
-public function index()
+/**
+ * Display a listing of the resource with optional filtering and sorting.
+ */
+public function index(Request $request)
 {
-    // Use paginate() instead of get() or all()
-    $posts = Post::with(['user', 'comments', 'likes'])
-                ->latest()
-                ->paginate(12); // or whatever number you prefer
-    
+    $query = Post::with([
+        'user',
+        'comments' => fn ($q) => $q->select('id', 'post_id'), // optimize comments loading
+        'likes' => fn ($q) => $q->select('id', 'post_id'),    // optimize likes loading
+    ]);
+
+    // === SEARCH FILTER ===
+    // Search in title and content (case-insensitive)
+    if ($search = $request->input('search')) {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'ILIKE', "%{$search}%")
+              ->orWhere('content', 'ILIKE', "%{$search}%");
+        });
+    }
+
+    // === AUTHOR FILTER ===
+    // Filter by user_id if author parameter is provided
+    if ($author = $request->integer('author')) {
+        $query->where('user_id', $author);
+    }
+
+    // === SORTING LOGIC ===
+    // Default to 'newest' if no sort parameter or invalid value
+    $sort = $request->input('sort', 'newest');
+
+    switch ($sort) {
+        case 'popular':
+            // Sort by number of likes (popularity)
+            $query->withCount('likes')
+                  ->orderBy('likes_count', 'desc')
+                  ->orderBy('created_at', 'desc'); // secondary sort for tie-breaking
+            break;
+
+        case 'most_commented':
+            // Sort by number of comments
+            $query->withCount('comments')
+                  ->orderBy('comments_count', 'desc')
+                  ->orderBy('created_at', 'desc'); // secondary sort for tie-breaking
+            break;
+
+        case 'newest':
+        default:
+            // Default: sort by newest first (created_at desc)
+            $query->latest();
+            break;
+    }
+
+    // === PAGINATION ===
+    // Paginate with 10 posts per page as required
+    $posts = $query->paginate(10);
+
     return view('posts.index', compact('posts'));
 }
 public function create()
