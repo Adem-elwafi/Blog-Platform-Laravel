@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;            // your Post model
+use App\Models\User;            // for fetching authors
 use Illuminate\Http\Request;      // for handling form requests
 use Illuminate\Support\Facades\Auth; // if you check current user
 
@@ -68,7 +69,14 @@ public function index(Request $request)
     // Paginate with 10 posts per page as required
     $posts = $query->paginate(10);
 
-    return view('posts.index', compact('posts'));
+    // === GET AUTHORS WITH POSTS ===
+    // Fetch all users who have published posts for the filter dropdown
+    $authors = User::has('posts')
+        ->select('id', 'name')
+        ->orderBy('name')
+        ->get();
+
+    return view('posts.index', compact('posts', 'authors'));
 }
 public function create()
 {

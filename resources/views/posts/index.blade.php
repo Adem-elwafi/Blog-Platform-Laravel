@@ -98,26 +98,14 @@
             </div>
 
             <!-- Filter/Sort Options -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="flex items-center space-x-2">
-                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by:</span>
-                </div>
-                
-                <div class="flex flex-wrap gap-2">
-                    <button class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
-                        Most Recent
-                    </button>
-                    <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                        Most Popular
-                    </button>
-                    <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                        Most Comments
-                    </button>
-                </div>
-            </div>
+            <!-- React Filters Section -->
+            <div 
+                data-component="PostFilters"
+                data-authors="{{ json_encode($authors) }}"
+                data-initial-search="{{ request('search', '') }}"
+                data-initial-author="{{ request('author', '') }}"
+                data-initial-sort="{{ request('sort', 'newest') }}"
+            ></div>
 
             <!-- Posts Grid -->
             @if($posts->count() > 0)
