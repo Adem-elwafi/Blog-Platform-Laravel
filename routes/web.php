@@ -8,9 +8,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AdminController;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [PostController::class, 'welcome'])->name('welcome');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

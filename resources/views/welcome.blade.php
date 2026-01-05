@@ -1,850 +1,839 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ config('app.name', 'Blog Platform') }} - Share Your Stories</title>
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         
-        <!-- Load GSAP -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+        
+        <!-- GSAP Animation Library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
         
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
         <style>
-            /* Simple, clean styles without conflicting animations */
-            .gradient-bg {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Custom Gradient Text Effect */
+            .gradient-text {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
             
-            .card-hover {
-                transition: all 0.3s ease;
+            /* Glassmorphism Effect */
+            .glass {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
             }
             
-            .card-hover:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            .glass-dark {
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
             
-            .nav-link {
-                position: relative;
-            }
-            
-            .nav-link::after {
-                content: '';
-                position: absolute;
-                width: 0;
-                height: 2px;
-                bottom: -2px;
-                left: 0;
-                background: currentColor;
-                transition: width 0.3s ease;
-            }
-            
-            .nav-link:hover::after {
-                width: 100%;
-            }
-            
-            .hero-text {
-                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            }
-            
-            /* Background Image Styles */
-            .hero-bg {
-                background-image: 
-                    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-                    url('https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
-                background-size: cover;
-                background-position: center;
-                background-attachment: fixed;
-                position: relative;
-            }
-            
-            .hero-bg::before {
-                content: '';
-                position: absolute;
+            /* Scroll Progress Bar */
+            .scroll-progress {
+                position: fixed;
                 top: 0;
                 left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(135deg, 
-                    rgba(59, 130, 246, 0.8) 0%, 
-                    rgba(147, 51, 234, 0.8) 100%);
-                mix-blend-mode: multiply;
+                width: 100%;
+                height: 4px;
+                background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+                z-index: 9999;
+                transform-origin: left;
+                transform: scaleX(0);
             }
             
-            .features-bg {
-                background-image: 
-                    linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
-                    url('https://images.unsplash.com/photo-1555099962-4199c345e5dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
-                background-size: cover;
-                background-position: center;
-                background-attachment: fixed;
+            /* Back to Top Button */
+            .back-to-top {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-center: center;
+                cursor: pointer;
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.3s ease;
+                z-index: 999;
             }
             
-            .dark .features-bg {
-                background-image: 
-                    linear-gradient(rgba(31, 41, 55, 0.92), rgba(31, 41, 55, 0.92)),
-                    url('https://images.unsplash.com/photo-1555099962-4199c345e5dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            .back-to-top.visible {
+                opacity: 1;
+                pointer-events: all;
             }
             
-            .cta-bg {
-                background-image: 
-                    linear-gradient(rgba(59, 130, 246, 0.85), rgba(147, 51, 234, 0.85)),
-                    url('https://images.unsplash.com/photo-1453928582365-b6ad33cbcf64?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80');
-                background-size: cover;
-                background-position: center;
-                background-attachment: fixed;
+            .back-to-top:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            }
+            
+            /* Animated Scroll Indicator */
+            .scroll-indicator {
+                animation: bounce 2s infinite;
+            }
+            
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {
+                    transform: translateY(0);
+                }
+                40% {
+                    transform: translateY(-10px);
+                }
+                60% {
+                    transform: translateY(-5px);
+                }
+            }
+            
+            /* Particle Background Animation */
+            @keyframes float {
+                0%, 100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+                50% {
+                    transform: translateY(-20px) rotate(180deg);
+                }
+            }
+            
+            .particle {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                animation: float 6s infinite ease-in-out;
+            }
+            
+            /* Performance optimization for animations */
+            .will-animate {
+                will-change: transform, opacity;
+            }
+            
+            /* Post Card Hover Effect */
+            .post-card {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            /* Gradient Background for Hero */
+            .hero-gradient {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
                 position: relative;
                 overflow: hidden;
             }
             
-            .cta-bg::before {
-                content: '';
-                position: absolute;
+            /* Loading Overlay */
+            .loading-overlay {
+                position: fixed;
                 top: 0;
                 left: 0;
-                right: 0;
-                bottom: 0;
-                background: 
-                    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-                animation: float 20s infinite ease-in-out;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
             }
             
-            .footer-bg {
-                background-image: 
-                    linear-gradient(rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95)),
-                    url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
-                background-size: cover;
-                background-position: center;
+            .loading-spinner {
+                width: 50px;
+                height: 50px;
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                border-top-color: white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
             }
-    
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            /* Responsive breakpoints adjustments */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
         </style>
-        
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Register plugins
-        if (typeof ScrollTrigger !== 'undefined') {
-            gsap.registerPlugin(ScrollTrigger);
-        }
-
-        // Check for reduced motion preference
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        
-        if (prefersReducedMotion) {
-            document.querySelectorAll('[data-animate]').forEach(el => {
-                el.style.opacity = '1';
-                el.style.transform = 'none';
-            });
-            return;
-        }
-
-        // Improved animation function with smoother easing
-        const animateElements = (selector, animation, delay = 0) => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach((el, index) => {
-                const elementDelay = parseFloat(el.getAttribute('data-delay')) || delay + (index * 0.08); // Reduced stagger
-                
-                switch(animation) {
-                    case 'fade-in':
-                        gsap.fromTo(el, 
-                            { 
-                                opacity: 0,
-                                scale: 0.98 
-                            },
-                            {
-                                opacity: 1,
-                                scale: 1,
-                                duration: 1.2,
-                                delay: elementDelay,
-                                ease: "expo.out"
-                            }
-                        );
-                        break;
-                        
-                    case 'slide-up':
-                        gsap.fromTo(el, 
-                            { 
-                                opacity: 0, 
-                                y: 40,
-                                scale: 0.95
-                            },
-                            {
-                                opacity: 1,
-                                y: 0,
-                                scale: 1,
-                                duration: 1.2,
-                                delay: elementDelay,
-                                ease: "expo.out"
-                            }
-                        );
-                        break;
-                        
-                    case 'slide-left':
-                        gsap.fromTo(el, 
-                            { 
-                                opacity: 0, 
-                                x: -40,
-                                skewX: 2
-                            },
-                            {
-                                opacity: 1,
-                                x: 0,
-                                skewX: 0,
-                                duration: 1.2,
-                                delay: elementDelay,
-                                ease: "expo.out"
-                            }
-                        );
-                        break;
-                        
-                    case 'scale-in':
-                        gsap.fromTo(el, 
-                            { 
-                                opacity: 0, 
-                                scale: 0.85,
-                                rotation: -2
-                            },
-                            {
-                                opacity: 1,
-                                scale: 1,
-                                rotation: 0,
-                                duration: 1.2,
-                                delay: elementDelay,
-                                ease: "back.out(1.4)"
-                            }
-                        );
-                        break;
-                        
-                    case 'blur-in':
-                        gsap.fromTo(el, 
-                            { 
-                                opacity: 0, 
-                                filter: "blur(10px)",
-                                y: 20
-                            },
-                            {
-                                opacity: 1,
-                                filter: "blur(0px)",
-                                y: 0,
-                                duration: 1.4,
-                                delay: elementDelay,
-                                ease: "expo.out"
-                            }
-                        );
-                        break;
-                        
-                    case 'rotate-in':
-                        gsap.fromTo(el, 
-                            { 
-                                opacity: 0, 
-                                rotationY: -10,
-                                scale: 0.9
-                            },
-                            {
-                                opacity: 1,
-                                rotationY: 0,
-                                scale: 1,
-                                duration: 1.4,
-                                delay: elementDelay,
-                                ease: "expo.out"
-                            }
-                        );
-                        break;
-                }
-            });
-        };
-
-        // Master timeline for sequenced animations
-        const masterTimeline = gsap.timeline();
-
-        // Animate navigation first
-        masterTimeline
-            .to(document.body, {
-                opacity: 1,
-                duration: 0.5
-            })
-            .add(() => {
-                animateElements('[data-animate="fade-in"]:not([data-delay])', 'fade-in', 0);
-            }, "+=0.2")
-            .add(() => {
-                animateElements('[data-animate="slide-left"]', 'slide-left', 0.1);
-            }, "+=0.1")
-            .add(() => {
-                animateElements('[data-animate="scale-in"]', 'scale-in', 0.2);
-            }, "+=0.1");
-
-        // Hero section with parallax effect
-        const heroSection = document.querySelector('.bg-gradient-to-br');
-        if (heroSection) {
-            const heroContent = heroSection.querySelectorAll('[data-animate]');
-            
-            masterTimeline
-                .add(() => {
-                    gsap.fromTo(heroContent,
-                        { 
-                            opacity: 0,
-                            y: 60,
-                            scale: 0.95
-                        },
-                        {
-                            opacity: 1,
-                            y: 0,
-                            scale: 1,
-                            duration: 1.6,
-                            stagger: 0.1,
-                            ease: "expo.out"
-                        }
-                    );
-                }, "-=0.5");
-
-            // Smooth parallax effect on hero section
-            gsap.to(heroSection, {
-                backgroundPosition: '50% 20%',
-                ease: "none",
-                scrollTrigger: {
-                    trigger: heroSection,
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true
-                }
-            });
-        }
-
-        // Enhanced card animations with ScrollTrigger
-        if (typeof ScrollTrigger !== 'undefined') {
-            // Features section with staggered reveal
-            const features = document.querySelectorAll('.card-hover[data-animate="slide-up"]');
-            features.forEach((feature, index) => {
-                gsap.fromTo(feature, 
-                    {
-                        opacity: 0,
-                        y: 80,
-                        rotationX: 5,
-                        scale: 0.95
-                    },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        rotationX: 0,
-                        scale: 1,
-                        duration: 1.4,
-                        delay: index * 0.1,
-                        ease: "expo.out",
-                        scrollTrigger: {
-                            trigger: feature,
-                            start: "top 90%",
-                            end: "top 60%",
-                            toggleActions: "play none none reverse",
-                            once: true
-                        }
-                    }
-                );
-            });
-
-            // CTA section with special entrance
-            const ctaSection = document.querySelector('.cta-bg');
-            if (ctaSection) {
-                const ctaElements = ctaSection.querySelectorAll('[data-animate]');
-                
-                gsap.fromTo(ctaElements,
-                    {
-                        opacity: 0,
-                        y: 60,
-                        scale: 0.9
-                    },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
-                        duration: 1.6,
-                        stagger: 0.15,
-                        ease: "expo.out",
-                        scrollTrigger: {
-                            trigger: ctaSection,
-                            start: "top 85%",
-                            toggleActions: "play none none none",
-                            once: true
-                        }
-                    }
-                );
-            }
-
-            // Add subtle scale to sections on scroll
-            const sections = document.querySelectorAll('section');
-            sections.forEach(section => {
-                gsap.fromTo(section,
-                    {
-                        scale: 0.99
-                    },
-                    {
-                        scale: 1,
-                        duration: 2,
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: section,
-                            start: "top 80%",
-                            end: "bottom 20%",
-                            scrub: 1
-                        }
-                    }
-                );
-            });
-        }
-
-        // Enhanced hero icon animation
-        const heroIcon = document.querySelector('.inline-flex.w-20.h-20');
-        if (heroIcon) {
-            gsap.to(heroIcon, {
-                y: -10,
-                rotation: 2,
-                duration: 3,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-            
-            // Add glow effect
-            gsap.to(heroIcon, {
-                boxShadow: "0 0 30px rgba(59, 130, 246, 0.5)",
-                duration: 2,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-        }
-
-        // Enhanced card hover effects with 3D-like transformation
-        document.querySelectorAll('.card-hover').forEach(card => {
-            // Initial state
-            gsap.set(card, {
-                transformPerspective: 1000
-            });
-
-            card.addEventListener('mouseenter', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const rotateY = ((x / rect.width) - 0.5) * 10;
-                const rotateX = ((y / rect.height) - 0.5) * -10;
-                
-                gsap.to(card, {
-                    duration: 0.4,
-                    y: -12,
-                    rotationX: rotateX,
-                    rotationY: rotateY,
-                    scale: 1.03,
-                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                    ease: "power2.out"
-                });
-                
-                // Add shine effect
-                const shine = document.createElement('div');
-                shine.style.position = 'absolute';
-                shine.style.inset = '0';
-                shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3) 0%, transparent 80%)`;
-                shine.style.pointerEvents = 'none';
-                shine.style.zIndex = '1';
-                shine.style.opacity = '0';
-                card.appendChild(shine);
-                
-                gsap.to(shine, {
-                    opacity: 1,
-                    duration: 0.3,
-                    onComplete: () => {
-                        gsap.to(shine, {
-                            opacity: 0,
-                            duration: 0.3,
-                            delay: 0.2,
-                            onComplete: () => shine.remove()
-                        });
-                    }
-                });
-            });
-            
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const rotateY = ((x / rect.width) - 0.5) * 10;
-                const rotateX = ((y / rect.height) - 0.5) * -10;
-                
-                gsap.to(card, {
-                    duration: 0.1,
-                    rotationX: rotateX,
-                    rotationY: rotateY,
-                    ease: "power1.out"
-                });
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                gsap.to(card, {
-                    duration: 0.6,
-                    y: 0,
-                    rotationX: 0,
-                    rotationY: 0,
-                    scale: 1,
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                    ease: "elastic.out(1, 0.5)"
-                });
-            });
-        });
-
-        // Add micro-interactions to buttons
-        document.querySelectorAll('button, a[href^="#"]').forEach(button => {
-            button.addEventListener('mousedown', () => {
-                gsap.to(button, {
-                    duration: 0.1,
-                    scale: 0.95,
-                    ease: "power2.in"
-                });
-            });
-            
-            button.addEventListener('mouseup', () => {
-                gsap.to(button, {
-                    duration: 0.3,
-                    scale: 1,
-                    ease: "elastic.out(1, 0.5)"
-                });
-            });
-            
-            button.addEventListener('mouseleave', () => {
-                gsap.to(button, {
-                    duration: 0.2,
-                    scale: 1,
-                    ease: "power2.out"
-                });
-            });
-        });
-
-        // Page transition effect on load
-        const pageTransition = gsap.timeline();
-        pageTransition
-            .fromTo('body',
-                {
-                    opacity: 0,
-                    filter: "blur(10px)"
-                },
-                {
-                    opacity: 1,
-                    filter: "blur(0px)",
-                    duration: 1.2,
-                    ease: "expo.out"
-                }
-            );
-    });
-</script>
     </head>
-    <body class="font-sans antialiased text-gray-900 dark:text-gray-100">
-        <div class="flex flex-col min-h-screen">
-            <!-- Navigation -->
-            <nav class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between items-center h-16">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </div>
-                            <a href="{{ url('/') }}" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                                {{ config('app.name', 'Blog Platform') }}
-                            </a>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            @auth
-                                <a href="{{ route('posts.index') }}" class="nav-link text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium hidden md:inline-block">
-                                    Explore Posts
-                                </a>
-                                <a href="{{ route('posts.create') }}" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                    </svg>
-                                    <span>Create Post</span>
-                                </a>
-                                @if(Auth::user()->role === 'admin')
-                                    <a href="{{ route('admin.dashboard') }}" class="nav-link text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium hidden md:inline-block">
-                                        Admin
-                                    </a>
-                                @endif
-                            @else
-                                <a href="{{ route('login') }}" class="nav-link text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">
-                                    Login
-                                </a>
-                                <a href="{{ route('register') }}" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
-                                    Get Started
-                                </a>
-                            @endauth
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Hero Section -->
-            <main class="flex-grow">
-                <div class="hero-bg">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-24 relative z-10">
-                        <div class="text-center">
-                            <div data-animate="scale-in" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                                </svg>
-                            </div>
-                            
-                            <h1 data-animate="slide-up" class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 hero-text">
-                                Share Your
-                                <span class="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Story</span>
-                            </h1>
-                            
-                            <p data-animate="slide-up" data-delay="0.1" class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-10">
-                                A beautiful, modern platform for sharing ideas, connecting with readers, and building your audience.
-                            </p>
-                            
-                            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-                                <a href="{{ route('posts.index') }}" 
-                                   data-animate="scale-in"
-                                   class="px-8 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-semibold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center space-x-2">
-                                    <span>Start Reading</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                    </svg>
-                                </a>
-                                @guest
-                                    <a href="{{ route('register') }}" 
-                                       data-animate="scale-in"
-                                       class="px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white/10 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl">
-                                        Join Community
-                                    </a>
-                                @endguest
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Features Section -->
-                <div class="features-bg dark:bg-gray-800/50 py-16 lg:py-24">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div class="text-center mb-12">
-                            <h2 data-animate="slide-up" class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                                Everything You Need to <span class="text-blue-600 dark:text-blue-400">Share</span>
-                            </h2>
-                            <p data-animate="slide-up" data-delay="0.1" class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                                Powerful features designed to help you create, connect, and grow your audience
-                            </p>
-                        </div>
+    <body class="font-sans antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <!-- Scroll Progress Bar -->
+        <div class="scroll-progress" id="scrollProgress"></div>
+        
+        <!-- Navigation Bar -->
+        <nav class="fixed top-0 left-0 right-0 z-50 glass-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <a href="{{ route('welcome') }}" class="text-2xl font-bold text-white hover:text-purple-300 transition-colors">
+                        {{ config('app.name', 'Blog Platform') }}
+                    </a>
+                    
+                    <!-- Navigation Links -->
+                    <div class="hidden md:flex items-center space-x-8">
+                        <a href="#featured" class="text-white hover:text-purple-300 transition-colors nav-link">Featured</a>
+                        <a href="#stats" class="text-white hover:text-purple-300 transition-colors nav-link">Stats</a>
+                        <a href="{{ route('posts.index') }}" class="text-white hover:text-purple-300 transition-colors nav-link">All Posts</a>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <!-- Feature 1 -->
-                            <div data-animate="slide-up" data-delay="0.1" class="card-hover bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-200/50 dark:border-gray-700/50">
-                                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Beautiful Posts</h3>
-                                <p class="text-gray-600 dark:text-gray-400 mb-4">
-                                    Create stunning posts with our rich editor. Format text, add images, and make your content shine.
-                                </p>
-                                <ul class="space-y-2 text-gray-600 dark:text-gray-400">
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Rich text editor</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Image support</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Auto-save drafts</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Feature 2 -->
-                            <div data-animate="slide-up" data-delay="0.2" class="card-hover bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-200/50 dark:border-gray-700/50">
-                                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Engaging Discussions</h3>
-                                <p class="text-gray-600 dark:text-gray-400 mb-4">
-                                    Build meaningful conversations with threaded comments and real-time updates.
-                                </p>
-                                <ul class="space-y-2 text-gray-600 dark:text-gray-400">
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Threaded comments</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Real-time updates</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Mention users</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Feature 3 -->
-                            <div data-animate="slide-up" data-delay="0.3" class="card-hover bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-200/50 dark:border-gray-700/50">
-                                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Simple Engagement</h3>
-                                <p class="text-gray-600 dark:text-gray-400 mb-4">
-                                    Show appreciation and engagement with a clean, intuitive like system.
-                                </p>
-                                <ul class="space-y-2 text-gray-600 dark:text-gray-400">
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>One-click likes</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Like counters</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>User activity feed</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CTA Section -->
-                <div class="cta-bg">
-                    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center relative z-10">
-                        <h2 data-animate="slide-up" class="text-3xl md:text-4xl font-bold text-white mb-6">
-                            Ready to Share Your Story?
-                        </h2>
-                        <p data-animate="slide-up" data-delay="0.1" class="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-                            Join thousands of writers and thinkers who are already sharing their ideas with the world.
-                        </p>
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            @auth
-                                <a href="{{ route('posts.create') }}" 
-                                   data-animate="scale-in"
-                                   class="px-8 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-semibold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl">
-                                    Create Your First Post
-                                </a>
-                                <a href="{{ route('posts.index') }}" 
-                                   data-animate="scale-in"
-                                   class="px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white/10 rounded-xl font-semibold text-lg transition-all duration-300">
-                                    Explore Community
-                                </a>
-                            @else
-                                <a href="{{ route('register') }}" 
-                                   data-animate="scale-in"
-                                   class="px-8 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-semibold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl">
-                                    Join Free Today
-                                </a>
-                                <a href="{{ route('posts.index') }}" 
-                                   data-animate="scale-in"
-                                   class="px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white/10 rounded-xl font-semibold text-lg transition-all duration-300">
-                                    Browse Posts
-                                </a>
-                            @endauth
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <!-- Footer -->
-            <footer class="footer-bg text-gray-100">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                        <!-- Brand Column -->
-                        <div class="md:col-span-1">
-                            <div class="flex items-center space-x-2 mb-4">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </div>
-                                <span class="text-xl font-bold text-white">{{ config('app.name', 'Blog Platform') }}</span>
-                            </div>
-                            <p class="text-gray-400 text-sm">
-                                A modern platform for sharing stories and connecting with readers worldwide.
-                            </p>
-                        </div>
-
-                        <!-- Quick Links -->
-                        <div>
-                            <h3 class="text-lg font-semibold text-white mb-4">Platform</h3>
-                            <ul class="space-y-2">
-                                <li><a href="{{ route('posts.index') }}" class="text-gray-400 hover:text-white transition-colors">Explore Posts</a></li>
-                                <li><a href="{{ route('posts.create') }}" class="text-gray-400 hover:text-white transition-colors">Create Post</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Top Writers</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Categories</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Resources -->
-                        <div>
-                            <h3 class="text-lg font-semibold text-white mb-4">Resources</h3>
-                            <ul class="space-y-2">
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Community</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Support</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Connect -->
-                        <div>
-                            <h3 class="text-lg font-semibold text-white mb-4">Connect</h3>
-                            <ul class="space-y-2">
-                                <li><a href="https://github.com/Adem-dev/blog-platform" target="_blank" rel="noopener" class="text-gray-400 hover:text-white transition-colors flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-                                    </svg>
-                                    <span>GitHub</span>
-                                </a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Twitter</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Discord</a></li>
-                            </ul>
-                        </div>
+                        @auth
+                            <a href="{{ route('dashboard') }}" class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-all">Dashboard</a>
+                        @else
+                            <a href="{{ route('login') }}" class="text-white hover:text-purple-300 transition-colors">Login</a>
+                            <a href="{{ route('register') }}" class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-all">Sign Up</a>
+                        @endauth
                     </div>
                     
-                    <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p class="text-gray-400 text-sm">&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}. All rights reserved.</p>
-                        <div class="flex items-center gap-6 text-sm">
-                            <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
-                            <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
-                            <a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a>
+                    <!-- Mobile Menu Button -->
+                    <button id="mobileMenuBtn" class="md:hidden text-white hover:text-purple-300 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden bg-black/30 backdrop-blur-lg">
+                <div class="px-4 pt-2 pb-4 space-y-3">
+                    <a href="#featured" class="block text-white hover:text-purple-300 transition-colors py-2">Featured</a>
+                    <a href="#stats" class="block text-white hover:text-purple-300 transition-colors py-2">Stats</a>
+                    <a href="{{ route('posts.index') }}" class="block text-white hover:text-purple-300 transition-colors py-2">All Posts</a>
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="block text-white hover:text-purple-300 transition-colors py-2">Dashboard</a>
+                    @else
+                        <a href="{{ route('login') }}" class="block text-white hover:text-purple-300 transition-colors py-2">Login</a>
+                        <a href="{{ route('register') }}" class="block text-white hover:text-purple-300 transition-colors py-2">Sign Up</a>
+                    @endauth
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Hero Section -->
+        <section class="hero-gradient min-h-screen flex items-center justify-center relative overflow-hidden">
+            <!-- Floating Particles -->
+            <div class="particle" style="width: 80px; height: 80px; top: 10%; left: 10%; animation-delay: 0s;"></div>
+            <div class="particle" style="width: 60px; height: 60px; top: 20%; right: 15%; animation-delay: 2s;"></div>
+            <div class="particle" style="width: 100px; height: 100px; bottom: 15%; left: 15%; animation-delay: 4s;"></div>
+            <div class="particle" style="width: 70px; height: 70px; bottom: 20%; right: 10%; animation-delay: 3s;"></div>
+            
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 pt-16">
+                <!-- Hero Title -->
+                <h1 class="hero-title text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white mb-6 will-animate">
+                    Welcome to Our Blog
+                </h1>
+                
+                <!-- Hero Subtitle -->
+                <p class="hero-subtitle text-xl sm:text-2xl md:text-3xl text-white/90 mb-8 max-w-3xl mx-auto will-animate">
+                    Discover amazing stories, insights, and ideas from our community of writers
+                </p>
+                
+                <!-- CTA Buttons -->
+                <div class="hero-cta flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 will-animate">
+                    <a href="{{ route('posts.index') }}" class="px-8 py-4 bg-white text-purple-600 rounded-full font-semibold text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-lg hover:shadow-2xl">
+                        Explore Posts
+                    </a>
+                    @guest
+                        <a href="{{ route('register') }}" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all shadow-lg hover:shadow-2xl">
+                            Join Community
+                        </a>
+                    @else
+                        <a href="{{ route('posts.create') }}" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all shadow-lg hover:shadow-2xl">
+                            Create Post
+                        </a>
+                    @endguest
+                </div>
+                
+                <!-- Mini Stats Preview -->
+                <div class="hero-stats grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-16 will-animate">
+                    <div class="glass rounded-lg p-4">
+                        <div class="text-3xl font-bold text-white">{{ $stats['posts'] }}+</div>
+                        <div class="text-sm text-white/80">Posts</div>
+                    </div>
+                    <div class="glass rounded-lg p-4">
+                        <div class="text-3xl font-bold text-white">{{ $stats['users'] }}+</div>
+                        <div class="text-sm text-white/80">Writers</div>
+                    </div>
+                    <div class="glass rounded-lg p-4">
+                        <div class="text-3xl font-bold text-white">{{ $stats['comments'] }}+</div>
+                        <div class="text-sm text-white/80">Comments</div>
+                    </div>
+                    <div class="glass rounded-lg p-4">
+                        <div class="text-3xl font-bold text-white">{{ $stats['likes'] }}+</div>
+                        <div class="text-sm text-white/80">Likes</div>
+                    </div>
+                </div>
+                
+                <!-- Scroll Indicator -->
+                <a href="#featured" class="scroll-indicator inline-block text-white">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </a>
+            </div>
+        </section>
+        
+        <!-- Featured Posts Section -->
+        <section id="featured" class="featured-posts py-20 bg-gray-50 dark:bg-gray-900">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Section Header -->
+                <div class="text-center mb-16">
+                    <h2 class="section-title text-4xl md:text-5xl font-bold mb-4 will-animate">
+                        <span class="gradient-text">Latest Posts</span>
+                    </h2>
+                    <p class="section-subtitle text-xl text-gray-600 dark:text-gray-400 will-animate">
+                        Explore the freshest content from our community
+                    </p>
+                </div>
+                
+                <!-- Posts Grid -->
+                @if($featuredPosts->count() > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        @foreach($featuredPosts as $post)
+                            <article class="post-card bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden will-animate">
+                                <!-- Post Image Placeholder -->
+                                <div class="post-image h-48 bg-gradient-to-br from-purple-400 to-pink-400 relative overflow-hidden">
+                                    <div class="absolute inset-0 flex items-center justify-center text-white">
+                                        <svg class="w-16 h-16 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0v8h12V6H4zm2 2h8v4H6V8z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Post Content -->
+                                <div class="p-6">
+                                    <!-- Post Title -->
+                                    <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                                        <a href="{{ route('posts.show', $post) }}">{{ Str::limit($post->title, 60) }}</a>
+                                    </h3>
+                                    
+                                    <!-- Post Excerpt -->
+                                    <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+                                        {{ Str::limit(strip_tags($post->content), 120) }}
+                                    </p>
+                                    
+                                    <!-- Post Meta -->
+                                    <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-500">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-semibold">
+                                                {{ substr($post->user->name, 0, 1) }}
+                                            </div>
+                                            <span>{{ $post->user->name }}</span>
+                                        </div>
+                                        <span>{{ $post->created_at->diffForHumans() }}</span>
+                                    </div>
+                                    
+                                    <!-- Post Stats -->
+                                    <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <div class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
+                                            </svg>
+                                            <span>{{ $post->likes->count() }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span>{{ $post->comments->count() }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                    
+                    <!-- View All Posts Button -->
+                    <div class="text-center mt-12">
+                        <a href="{{ route('posts.index') }}" class="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all">
+                            View All Posts
+                        </a>
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <p class="text-xl text-gray-600 dark:text-gray-400">No posts yet. Be the first to create one!</p>
+                        @auth
+                            <a href="{{ route('posts.create') }}" class="inline-block mt-6 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all">
+                                Create First Post
+                            </a>
+                        @endauth
+                    </div>
+                @endif
+            </div>
+        </section>
+        
+        <!-- Stats Section with Animated Counters -->
+        <section id="stats" class="stats-section py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;1&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+            </div>
+            
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                        Platform Statistics
+                    </h2>
+                    <p class="text-xl text-white/90">
+                        Join our growing community of writers and readers
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <!-- Posts Counter -->
+                    <div class="stat-item text-center glass rounded-2xl p-8">
+                        <div class="stat-number text-5xl md:text-6xl font-bold text-white mb-2" data-target="{{ $stats['posts'] }}">0</div>
+                        <div class="stat-label text-lg text-white/90">Blog Posts</div>
+                        <svg class="w-12 h-12 mx-auto mt-4 text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Users Counter -->
+                    <div class="stat-item text-center glass rounded-2xl p-8">
+                        <div class="stat-number text-5xl md:text-6xl font-bold text-white mb-2" data-target="{{ $stats['users'] }}">0</div>
+                        <div class="stat-label text-lg text-white/90">Writers</div>
+                        <svg class="w-12 h-12 mx-auto mt-4 text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Comments Counter -->
+                    <div class="stat-item text-center glass rounded-2xl p-8">
+                        <div class="stat-number text-5xl md:text-6xl font-bold text-white mb-2" data-target="{{ $stats['comments'] }}">0</div>
+                        <div class="stat-label text-lg text-white/90">Comments</div>
+                        <svg class="w-12 h-12 mx-auto mt-4 text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Likes Counter -->
+                    <div class="stat-item text-center glass rounded-2xl p-8">
+                        <div class="stat-number text-5xl md:text-6xl font-bold text-white mb-2" data-target="{{ $stats['likes'] }}">0</div>
+                        <div class="stat-label text-lg text-white/90">Total Likes</div>
+                        <svg class="w-12 h-12 mx-auto mt-4 text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Call-to-Action Section -->
+        <section class="cta-section py-20 bg-gray-50 dark:bg-gray-800">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="cta-content max-w-4xl mx-auto text-center bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-12 shadow-2xl will-animate">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                        Ready to Share Your Story?
+                    </h2>
+                    <p class="text-xl text-white/90 mb-8">
+                        Join our community of passionate writers and start creating amazing content today!
+                    </p>
+                    @guest
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-purple-600 rounded-full font-semibold text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-lg">
+                                Get Started Free
+                            </a>
+                            <a href="{{ route('posts.index') }}" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-purple-600 transition-all">
+                                Browse Posts
+                            </a>
+                        </div>
+                    @else
+                        <a href="{{ route('posts.create') }}" class="inline-block px-8 py-4 bg-white text-purple-600 rounded-full font-semibold text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-lg">
+                            Create Your First Post
+                        </a>
+                    @endauth
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                    <!-- About -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">{{ config('app.name', 'Blog Platform') }}</h3>
+                        <p class="text-gray-400">A modern platform for writers to share their stories and connect with readers.</p>
+                    </div>
+                    
+                    <!-- Quick Links -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="{{ route('posts.index') }}" class="text-gray-400 hover:text-white transition-colors">All Posts</a></li>
+                            @auth
+                                <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-white transition-colors">Dashboard</a></li>
+                                <li><a href="{{ route('posts.create') }}" class="text-gray-400 hover:text-white transition-colors">Create Post</a></li>
+                            @else
+                                <li><a href="{{ route('login') }}" class="text-gray-400 hover:text-white transition-colors">Login</a></li>
+                                <li><a href="{{ route('register') }}" class="text-gray-400 hover:text-white transition-colors">Register</a></li>
+                            @endauth
+                        </ul>
+                    </div>
+                    
+                    <!-- Community -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Community</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Guidelines</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Social -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Connect</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                            </a>
                         </div>
                     </div>
                 </div>
-            </footer>
-        </div>
+                
+                <!-- Copyright -->
+                <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+                    <p>&copy; {{ date('Y') }} {{ config('app.name', 'Blog Platform') }}. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to Top Button -->
+        <button class="back-to-top" id="backToTop" aria-label="Back to top">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+            </svg>
+        </button>
+        
+        <!-- GSAP Animations Script -->
+        <script>
+            // Wait for DOM to be ready
+            document.addEventListener('DOMContentLoaded', function() {
+                
+                // Register ScrollTrigger plugin
+                gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+                
+                // ============================================
+                // LOADING ANIMATION
+                // ============================================
+                // Hide loading overlay after page loads
+                gsap.to('#loadingOverlay', {
+                    duration: 0.5,
+                    opacity: 0,
+                    delay: 0.3,
+                    onComplete: function() {
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        // Start hero animations after loading completes
+                        initHeroAnimations();
+                    }
+                });
+                
+                // ============================================
+                // HERO SECTION ANIMATIONS (On Page Load)
+                // ============================================
+                function initHeroAnimations() {
+                    // Hero title slides up and fades in
+                    gsap.from('.hero-title', {
+                        duration: 1.2,
+                        y: 60,
+                        opacity: 0,
+                        ease: 'power3.out'
+                    });
+                    
+                    // Subtitle follows with slight delay
+                    gsap.from('.hero-subtitle', {
+                        duration: 1,
+                        y: 40,
+                        opacity: 0,
+                        delay: 0.3,
+                        ease: 'power3.out'
+                    });
+                    
+                    // CTA buttons with stagger effect (appear one after another)
+                    gsap.from('.hero-cta a', {
+                        duration: 0.8,
+                        y: 30,
+                        opacity: 0,
+                        delay: 0.6,
+                        stagger: 0.2, // 0.2s delay between each button
+                        ease: 'power2.out'
+                    });
+                    
+                    // Hero stats cards with stagger
+                    gsap.from('.hero-stats > div', {
+                        duration: 0.8,
+                        y: 30,
+                        opacity: 0,
+                        delay: 0.9,
+                        stagger: 0.1,
+                        ease: 'power2.out'
+                    });
+                    
+                    // Scroll indicator
+                    gsap.from('.scroll-indicator', {
+                        duration: 0.8,
+                        opacity: 0,
+                        delay: 1.2,
+                        ease: 'power2.out'
+                    });
+                }
+                
+                // ============================================
+                // SCROLL-TRIGGERED ANIMATIONS
+                // ============================================
+                
+                // Section titles animation
+                gsap.utils.toArray('.section-title, .section-subtitle').forEach(element => {
+                    gsap.from(element, {
+                        scrollTrigger: {
+                            trigger: element,
+                            start: 'top 85%',
+                            toggleActions: 'play none none none'
+                        },
+                        duration: 0.8,
+                        y: 40,
+                        opacity: 0,
+                        ease: 'power2.out'
+                    });
+                });
+                
+                // Featured posts cards - stagger animation
+                gsap.from('.post-card', {
+                    scrollTrigger: {
+                        trigger: '.featured-posts',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none'
+                    },
+                    duration: 0.8,
+                    y: 60,
+                    opacity: 0,
+                    stagger: 0.15, // Cards appear one by one
+                    ease: 'power2.out'
+                });
+                
+                // Stats section animation
+                gsap.from('.stat-item', {
+                    scrollTrigger: {
+                        trigger: '.stats-section',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none'
+                    },
+                    duration: 0.8,
+                    scale: 0.8,
+                    opacity: 0,
+                    stagger: 0.1,
+                    ease: 'back.out(1.7)'
+                });
+                
+                // Animated counter for stats
+                // Counts from 0 to target number when stats section comes into view
+                document.querySelectorAll('.stat-number').forEach(stat => {
+                    const target = parseInt(stat.getAttribute('data-target'));
+                    
+                    gsap.from(stat, {
+                        scrollTrigger: {
+                            trigger: '.stats-section',
+                            start: 'top 75%',
+                            toggleActions: 'play none none none'
+                        },
+                        duration: 2,
+                        textContent: 0,
+                        snap: { textContent: 1 }, // Snap to whole numbers
+                        ease: 'power1.inOut',
+                        onUpdate: function() {
+                            stat.textContent = Math.ceil(stat.textContent);
+                        }
+                    });
+                });
+                
+                // CTA section animation
+                gsap.from('.cta-content', {
+                    scrollTrigger: {
+                        trigger: '.cta-section',
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
+                    },
+                    duration: 1,
+                    scale: 0.9,
+                    opacity: 0,
+                    ease: 'back.out(1.4)'
+                });
+                
+                // ============================================
+                // POST CARD HOVER EFFECTS
+                // ============================================
+                // Enhanced hover animation for post cards using GSAP
+                document.querySelectorAll('.post-card').forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        gsap.to(card, {
+                            y: -12,
+                            scale: 1.03,
+                            boxShadow: '0 25px 50px rgba(102, 126, 234, 0.25)',
+                            duration: 0.3,
+                            ease: 'power2.out'
+                        });
+                    });
+                    
+                    card.addEventListener('mouseleave', () => {
+                        gsap.to(card, {
+                            y: 0,
+                            scale: 1,
+                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                            duration: 0.3,
+                            ease: 'power2.out'
+                        });
+                    });
+                });
+                
+                // ============================================
+                // SCROLL PROGRESS BAR
+                // ============================================
+                // Updates progress bar as user scrolls down the page
+                const scrollProgress = document.getElementById('scrollProgress');
+                
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const scrollPercentage = (scrollTop / scrollHeight);
+                    
+                    gsap.to(scrollProgress, {
+                        scaleX: scrollPercentage,
+                        duration: 0.1,
+                        ease: 'none'
+                    });
+                });
+                
+                // ============================================
+                // BACK TO TOP BUTTON
+                // ============================================
+                // Shows button after scrolling 500px, smooth scroll to top on click
+                const backToTop = document.getElementById('backToTop');
+                
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 500) {
+                        backToTop.classList.add('visible');
+                    } else {
+                        backToTop.classList.remove('visible');
+                    }
+                });
+                
+                backToTop.addEventListener('click', () => {
+                    gsap.to(window, {
+                        duration: 1,
+                        scrollTo: { y: 0, autoKill: true },
+                        ease: 'power3.inOut'
+                    });
+                });
+                
+                // ============================================
+                // MOBILE MENU TOGGLE
+                // ============================================
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                const mobileMenu = document.getElementById('mobileMenu');
+                
+                if (mobileMenuBtn && mobileMenu) {
+                    mobileMenuBtn.addEventListener('click', () => {
+                        mobileMenu.classList.toggle('hidden');
+                        
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            gsap.from(mobileMenu, {
+                                duration: 0.3,
+                                height: 0,
+                                opacity: 0,
+                                ease: 'power2.out'
+                            });
+                        }
+                    });
+                    
+                    // Close mobile menu when clicking on links
+                    document.querySelectorAll('#mobileMenu a').forEach(link => {
+                        link.addEventListener('click', () => {
+                            mobileMenu.classList.add('hidden');
+                        });
+                    });
+                }
+                
+                // ============================================
+                // SMOOTH SCROLL FOR ANCHOR LINKS
+                // ============================================
+                // Smooth scroll to sections when clicking navigation links
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        
+                        if (target) {
+                            gsap.to(window, {
+                                duration: 1,
+                                scrollTo: { y: target, offsetY: 80 },
+                                ease: 'power3.inOut'
+                            });
+                        }
+                    });
+                });
+                
+                // ============================================
+                // PARALLAX EFFECT ON POST IMAGES (Optional)
+                // ============================================
+                // Subtle parallax movement on post card images
+                gsap.utils.toArray('.post-image').forEach(image => {
+                    gsap.to(image, {
+                        scrollTrigger: {
+                            trigger: image,
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: 1 // Smooth scrubbing effect
+                        },
+                        y: -30,
+                        ease: 'none'
+                    });
+                });
+                
+                // ============================================
+                // ACCESSIBILITY: RESPECT REDUCED MOTION
+                // ============================================
+                // Disable animations if user prefers reduced motion
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+                
+                if (prefersReducedMotion.matches) {
+                    // Kill all GSAP animations
+                    gsap.globalTimeline.clear();
+                    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+                    
+                    // Remove loading overlay immediately
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }
+                
+            });
+        </script>
     </body>
 </html>

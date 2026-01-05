@@ -4,11 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;            // your Post model
 use App\Models\User;            // for fetching authors
+use App\Models\Comment;         // for stats
+use App\Models\Like;            // for stats
 use Illuminate\Http\Request;      // for handling form requests
 use Illuminate\Support\Facades\Auth; // if you check current user
 
 class PostController extends Controller
 {
+    /**
+     * Display the welcome page with featured posts and stats.
+     */
+    public function welcome()
+    {
+        // Fetch 6 most recent posts with relationships for featured section
+        $featuredPosts = Post::with(['user', 'likes', 'comments'])
+            ->latest()
+            ->take(6)
+            ->get();
+        
+        // Calculate platform statistics for animated counter section
+        $stats = [
+            'posts' => Post::count(),
+            'users' => User::count(),
+            'comments' => Comment::count(),
+            'likes' => Like::count(),
+        ];
+        
+        return view('welcome', compact('featuredPosts', 'stats'));
+    }
+
     /**
      * Display a listing of the resource.
      */
