@@ -16,7 +16,7 @@
 
         <!-- Form Card -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <form method="POST" action="{{ route('posts.update', $post) }}" class="p-6 sm:p-8">
+            <form method="POST" action="{{ route('posts.update', $post) }}" enctype="multipart/form-data" class="p-6 sm:p-8">
                 @csrf
                 @method('PUT')
 
@@ -48,6 +48,64 @@
                             {{ $message }}
                         </p>
                     @enderror
+                </div>
+
+                <!-- Image Upload Section -->
+                <div class="mb-8">
+                    <label for="image" class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">
+                        Post Image
+                    </label>
+
+                    @if($post->image)
+                        <div class="mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">Current Image:</p>
+                            <div class="relative inline-block">
+                                <img src="{{ asset('storage/' . $post->image) }}" 
+                                     alt="Current post image" 
+                                     class="max-w-md w-full rounded-lg shadow-md border-2 border-gray-200 dark:border-gray-600">
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="relative">
+                        <input 
+                            type="file" 
+                            name="image" 
+                            id="image"
+                            accept="image/*"
+                            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
+                        >
+                        @error('image')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        @if($post->image)
+                            Upload a new image to replace the current one (Max: 2MB)
+                        @else
+                            Upload an image for this post (Optional, Max: 2MB)
+                        @endif
+                    </p>
+
+                    <!-- New Image Preview -->
+                    <div id="imagePreview" class="mt-4 hidden">
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Image Preview:</p>
+                        <div class="relative inline-block">
+                            <img src="" alt="Preview" class="max-w-md w-full rounded-lg shadow-lg border-2 border-blue-300 dark:border-blue-600">
+                            <button type="button" 
+                                    onclick="clearImagePreview()"
+                                    class="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Content Input -->
@@ -155,4 +213,43 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
     </style>
+
+    <script>
+        // Image preview functionality
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size (2MB max)
+                if (file.size > 2048 * 1024) {
+                    alert('File size must be less than 2MB');
+                    this.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please upload a valid image file (JPEG, PNG, JPG, GIF, or WebP)');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    const img = preview.querySelector('img');
+                    img.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function clearImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            const imageInput = document.getElementById('image');
+            preview.classList.add('hidden');
+            imageInput.value = '';
+        }
+    </script>
 </x-app-layout>

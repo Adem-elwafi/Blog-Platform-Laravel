@@ -15,6 +15,7 @@ class Post extends Model
     protected $fillable = [
         'title',
         'content',
+        'image', // Added for image upload functionality
         'user_id',
     ];
 

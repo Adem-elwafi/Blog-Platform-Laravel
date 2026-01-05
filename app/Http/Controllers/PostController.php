@@ -8,6 +8,7 @@ use App\Models\Comment;         // for stats
 use App\Models\Like;            // for stats
 use Illuminate\Http\Request;      // for handling form requests
 use Illuminate\Support\Facades\Auth; // if you check current user
+use Illuminate\Support\Facades\Storage; // for handling image storage
 
 class PostController extends Controller
 {
@@ -118,16 +119,24 @@ public function show(Post $post)
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // Validate form inputs including optional image
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Max 2MB
         ]);
 
-        $post = Post::create([
-            'title' => $request->title,
-            'content' => $request->get('content'),
-            'user_id' => Auth::id(),
-        ]);
+        // Handle image upload if provided
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('posts', 'public');
+            $validated['image'] = $imagePath;
+        }
+
+        // Add authenticated user ID
+        $validated['user_id'] = Auth::id();
+
+        // Create post with validated data
+        $post = Post::create($validated);
 
         return redirect()->route('posts.show', $post)->with('success', 'Post created successfully.');
     }
@@ -150,15 +159,27 @@ public function show(Post $post)
                 abort(403);
             }
 
-            $request->validate([
+            // Validate form inputs including optional image
+            $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'content' => 'required|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Max 2MB
             ]);
 
-            $post->update([
-                'title' => $request->title,
-                'content' => $request->get('content'),
-            ]);
+            // Handle new image upload if provided
+            if ($request->hasFile('image')) {
+                // Delete old image if it exists
+                if ($post->image) {
+                    Storage::disk('public')->delete($post->image);
+                }
+                
+                // Store new image
+                $imagePath = $request->file('image')->store('posts', 'public');
+                $validated['image'] = $imagePath;
+            }
+
+            // Update post with validated data
+            $post->update($validated);
 
             return redirect()->route('posts.show', $post)->with('success', 'Post updated successfully.');
         }
@@ -168,6 +189,11 @@ public function show(Post $post)
             // Authorization check
             if (Auth::id() !== $post->user_id && Auth::user()->role !== 'admin') {
                 abort(403);
+            }
+
+            // Delete associated image if it exists
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
             }
 
             $post->delete();
