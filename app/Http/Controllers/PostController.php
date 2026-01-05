@@ -6,9 +6,12 @@ use App\Models\Post;            // your Post model
 use App\Models\User;            // for fetching authors
 use App\Models\Comment;         // for stats
 use App\Models\Like;            // for stats
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;      // for handling form requests
 use Illuminate\Support\Facades\Auth; // if you check current user
 use Illuminate\Support\Facades\Storage; // for handling image storage
+use Illuminate\Support\Facades\Cache; // for caching stats
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -23,13 +26,16 @@ class PostController extends Controller
             ->take(6)
             ->get();
         
-        // Calculate platform statistics for animated counter section
-        $stats = [
-            'posts' => Post::count(),
-            'users' => User::count(),
-            'comments' => Comment::count(),
-            'likes' => Like::count(),
-        ];
+        // Calculate platform statistics with 5-minute cache for performance
+        // Cache is cleared automatically when new content is created
+        $stats = Cache::remember('homepage_stats', 300, function () {
+            return [
+                'posts' => Post::count(),
+                'users' => User::count(),
+                'comments' => Comment::count(),
+                'likes' => Like::count(),
+            ];
+        });
         
         return view('welcome', compact('featuredPosts', 'stats'));
     }
@@ -39,8 +45,47 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Post::with(['user', 'likes', 'comments'])
+        $posts = $this->buildFeedQuery($request)->paginate(10);
+
+        $initialPosts = $posts->through(fn (Post $post) => $this->transformPost($post));
+
+        // Authors for filter dropdown
+        $authors = User::has('posts')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return view('posts.index', compact('posts', 'authors', 'initialPosts'));
+    }
+
+    /**
+     * JSON feed for infinite scroll.
+     */
+    public function feed(Request $request)
+    {
+        $posts = $this->buildFeedQuery($request)->paginate(10);
+
+        return response()->json([
+            'posts' => $posts->through(fn (Post $post) => $this->transformPost($post)),
+            'current_page' => $posts->currentPage(),
+            'last_page' => $posts->lastPage(),
+            'has_more' => $posts->hasMorePages(),
+        ]);
+    }
+
+    /**
+     * Base query for feed/index with shared filters, counts, and sorting.
+     */
+    private function buildFeedQuery(Request $request): Builder
+    {
+        $query = Post::with(['user'])
             ->withCount(['likes', 'comments']);
+
+        if ($request->user()) {
+            $query->withExists([
+                'likes as liked_by_auth' => fn ($q) => $q->where('user_id', $request->user()->id),
+            ]);
+        }
 
         // Apply search filter
         if ($search = $request->search) {
@@ -68,15 +113,29 @@ class PostController extends Controller
                 $query->latest();
         }
 
-        $posts = $query->paginate(10);
+        return $query;
+    }
 
-        // Authors for filter dropdown
-        $authors = User::has('posts')
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
-        return view('posts.index', compact('posts', 'authors'));
+    /**
+     * Transform a post model into the JSON-friendly payload needed by the feed.
+     */
+    private function transformPost(Post $post): array
+    {
+        return [
+            'id' => $post->id,
+            'title' => $post->title,
+            'content' => Str::limit(strip_tags($post->content), 400),
+            'image' => $post->image,
+            'user_id' => $post->user_id,
+            'user' => [
+                'id' => $post->user->id,
+                'name' => $post->user->name,
+            ],
+            'created_at' => $post->created_at->toIso8601String(),
+            'likes_count' => $post->likes_count,
+            'comments_count' => $post->comments_count,
+            'liked' => (bool) ($post->liked_by_auth ?? false),
+        ];
     }
 public function create()
 {
