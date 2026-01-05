@@ -35,74 +35,49 @@ class PostController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of posts in the social feed style with filters and sorting.
      */
-// In app/Http/Controllers/PostController.php
-/**
- * Display a listing of the resource with optional filtering and sorting.
- */
-public function index(Request $request)
-{
-    $query = Post::with([
-        'user',
-        'comments' => fn ($q) => $q->select('id', 'post_id'), // optimize comments loading
-        'likes' => fn ($q) => $q->select('id', 'post_id'),    // optimize likes loading
-    ]);
+    public function index(Request $request)
+    {
+        $query = Post::with(['user', 'likes', 'comments'])
+            ->withCount(['likes', 'comments']);
 
-    // === SEARCH FILTER ===
-    // Search in title and content (case-insensitive)
-    if ($search = $request->input('search')) {
-        $query->where(function ($q) use ($search) {
-            $q->where('title', 'ILIKE', "%{$search}%")
-              ->orWhere('content', 'ILIKE', "%{$search}%");
-        });
+        // Apply search filter
+        if ($search = $request->search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by author
+        if ($author = $request->author) {
+            $query->where('user_id', $author);
+        }
+
+        // Sorting options
+        $sort = $request->sort ?? 'newest';
+        switch ($sort) {
+            case 'popular':
+                $query->orderBy('likes_count', 'desc');
+                break;
+            case 'most_commented':
+                $query->orderBy('comments_count', 'desc');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $posts = $query->paginate(10);
+
+        // Authors for filter dropdown
+        $authors = User::has('posts')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return view('posts.index', compact('posts', 'authors'));
     }
-
-    // === AUTHOR FILTER ===
-    // Filter by user_id if author parameter is provided
-    if ($author = $request->integer('author')) {
-        $query->where('user_id', $author);
-    }
-
-    // === SORTING LOGIC ===
-    // Default to 'newest' if no sort parameter or invalid value
-    $sort = $request->input('sort', 'newest');
-
-    switch ($sort) {
-        case 'popular':
-            // Sort by number of likes (popularity)
-            $query->withCount('likes')
-                  ->orderBy('likes_count', 'desc')
-                  ->orderBy('created_at', 'desc'); // secondary sort for tie-breaking
-            break;
-
-        case 'most_commented':
-            // Sort by number of comments
-            $query->withCount('comments')
-                  ->orderBy('comments_count', 'desc')
-                  ->orderBy('created_at', 'desc'); // secondary sort for tie-breaking
-            break;
-
-        case 'newest':
-        default:
-            // Default: sort by newest first (created_at desc)
-            $query->latest();
-            break;
-    }
-
-    // === PAGINATION ===
-    // Paginate with 10 posts per page as required
-    $posts = $query->paginate(10);
-
-    // === GET AUTHORS WITH POSTS ===
-    // Fetch all users who have published posts for the filter dropdown
-    $authors = User::has('posts')
-        ->select('id', 'name')
-        ->orderBy('name')
-        ->get();
-
-    return view('posts.index', compact('posts', 'authors'));
-}
 public function create()
 {
     return view('posts.create');
