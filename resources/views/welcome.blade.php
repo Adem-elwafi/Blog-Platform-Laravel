@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -545,114 +545,184 @@
                 // ============================================
                 // LOADING ANIMATION
                 // ============================================
-                // Hide loading overlay after page loads
-                gsap.to('#loadingOverlay', {
-                    duration: 0.5,
-                    opacity: 0,
-                    delay: 0.3,
-                    onComplete: function() {
-                        document.getElementById('loadingOverlay').style.display = 'none';
-                        // Start hero animations after loading completes
+                // Hide loading overlay after page loads with safety fallback
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                
+                if (loadingOverlay) {
+                    gsap.to(loadingOverlay, {
+                        duration: 0.5,
+                        opacity: 0,
+                        delay: 0.3,
+                        onComplete: function() {
+                            loadingOverlay.style.display = 'none';
+                            // Start hero animations after loading completes
+                            initHeroAnimations();
+                        }
+                    });
+                } else {
+                    // If loading overlay doesn't exist, start animations immediately
+                    initHeroAnimations();
+                }
+                
+                // Safety fallback: ensure loading overlay is hidden after max 2 seconds
+                setTimeout(() => {
+                    if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+                        loadingOverlay.style.display = 'none';
                         initHeroAnimations();
                     }
-                });
+                }, 2000);
                 
                 // ============================================
                 // HERO SECTION ANIMATIONS (On Page Load)
                 // ============================================
                 function initHeroAnimations() {
+                    // Ensure elements are visible first, then animate
                     // Hero title slides up and fades in
-                    gsap.from('.hero-title', {
-                        duration: 1.2,
-                        y: 60,
-                        opacity: 0,
-                        ease: 'power3.out'
-                    });
+                    const heroTitle = document.querySelector('.hero-title');
+                    if (heroTitle) {
+                        gsap.fromTo(heroTitle, 
+                            { y: 60, opacity: 0 },
+                            { 
+                                duration: 1.2,
+                                y: 0,
+                                opacity: 1,
+                                ease: 'power3.out'
+                            }
+                        );
+                    }
                     
                     // Subtitle follows with slight delay
-                    gsap.from('.hero-subtitle', {
-                        duration: 1,
-                        y: 40,
-                        opacity: 0,
-                        delay: 0.3,
-                        ease: 'power3.out'
-                    });
+                    const heroSubtitle = document.querySelector('.hero-subtitle');
+                    if (heroSubtitle) {
+                        gsap.fromTo(heroSubtitle,
+                            { y: 40, opacity: 0 },
+                            {
+                                duration: 1,
+                                y: 0,
+                                opacity: 1,
+                                delay: 0.3,
+                                ease: 'power3.out'
+                            }
+                        );
+                    }
                     
                     // CTA buttons with stagger effect (appear one after another)
-                    gsap.from('.hero-cta a', {
-                        duration: 0.8,
-                        y: 30,
-                        opacity: 0,
-                        delay: 0.6,
-                        stagger: 0.2, // 0.2s delay between each button
-                        ease: 'power2.out'
-                    });
+                    const heroButtons = document.querySelectorAll('.hero-cta a');
+                    if (heroButtons.length > 0) {
+                        gsap.fromTo(heroButtons,
+                            { y: 30, opacity: 0 },
+                            {
+                                duration: 0.8,
+                                y: 0,
+                                opacity: 1,
+                                delay: 0.6,
+                                stagger: 0.2, // 0.2s delay between each button
+                                ease: 'power2.out'
+                            }
+                        );
+                    }
                     
                     // Hero stats cards with stagger
-                    gsap.from('.hero-stats > div', {
-                        duration: 0.8,
-                        y: 30,
-                        opacity: 0,
-                        delay: 0.9,
-                        stagger: 0.1,
-                        ease: 'power2.out'
-                    });
+                    const heroStats = document.querySelectorAll('.hero-stats > div');
+                    if (heroStats.length > 0) {
+                        gsap.fromTo(heroStats,
+                            { y: 30, opacity: 0 },
+                            {
+                                duration: 0.8,
+                                y: 0,
+                                opacity: 1,
+                                delay: 0.9,
+                                stagger: 0.1,
+                                ease: 'power2.out'
+                            }
+                        );
+                    }
                     
                     // Scroll indicator
-                    gsap.from('.scroll-indicator', {
-                        duration: 0.8,
-                        opacity: 0,
-                        delay: 1.2,
-                        ease: 'power2.out'
-                    });
+                    const scrollIndicator = document.querySelector('.scroll-indicator');
+                    if (scrollIndicator) {
+                        gsap.fromTo(scrollIndicator,
+                            { opacity: 0 },
+                            {
+                                duration: 0.8,
+                                opacity: 1,
+                                delay: 1.2,
+                                ease: 'power2.out'
+                            }
+                        );
+                    }
                 }
                 
                 // ============================================
                 // SCROLL-TRIGGERED ANIMATIONS
                 // ============================================
                 
-                // Section titles animation
-                gsap.utils.toArray('.section-title, .section-subtitle').forEach(element => {
-                    gsap.from(element, {
-                        scrollTrigger: {
-                            trigger: element,
-                            start: 'top 85%',
-                            toggleActions: 'play none none none'
-                        },
-                        duration: 0.8,
-                        y: 40,
-                        opacity: 0,
-                        ease: 'power2.out'
+                // Section titles animation - safer approach
+                const sectionTitles = document.querySelectorAll('.section-title, .section-subtitle');
+                if (sectionTitles.length > 0) {
+                    gsap.utils.toArray('.section-title, .section-subtitle').forEach(element => {
+                        gsap.fromTo(element,
+                            { y: 40, opacity: 0 },
+                            {
+                                scrollTrigger: {
+                                    trigger: element,
+                                    start: 'top 90%',
+                                    end: 'bottom 20%',
+                                    toggleActions: 'play none none none',
+                                    once: true
+                                },
+                                duration: 0.8,
+                                y: 0,
+                                opacity: 1,
+                                ease: 'power2.out'
+                            }
+                        );
                     });
-                });
+                }
                 
-                // Featured posts cards - stagger animation
-                gsap.from('.post-card', {
-                    scrollTrigger: {
-                        trigger: '.featured-posts',
-                        start: 'top 75%',
-                        toggleActions: 'play none none none'
-                    },
-                    duration: 0.8,
-                    y: 60,
-                    opacity: 0,
-                    stagger: 0.15, // Cards appear one by one
-                    ease: 'power2.out'
-                });
+                // Featured posts cards - stagger animation with individual triggers
+                // Check if post cards exist before animating
+                const postCards = document.querySelectorAll('.post-card');
+                if (postCards.length > 0) {
+                    // Animate each card individually when it enters viewport
+                    postCards.forEach((card, index) => {
+                        gsap.from(card, {
+                            scrollTrigger: {
+                                trigger: card,
+                                start: 'top 90%', // Start earlier to ensure animation triggers
+                                end: 'bottom 20%',
+                                toggleActions: 'play none none none',
+                                once: true // Only animate once
+                            },
+                            duration: 0.8,
+                            y: 60,
+                            opacity: 0,
+                            delay: index * 0.1, // Stagger effect
+                            ease: 'power2.out'
+                        });
+                    });
+                }
                 
-                // Stats section animation
-                gsap.from('.stat-item', {
-                    scrollTrigger: {
-                        trigger: '.stats-section',
-                        start: 'top 75%',
-                        toggleActions: 'play none none none'
-                    },
-                    duration: 0.8,
-                    scale: 0.8,
-                    opacity: 0,
-                    stagger: 0.1,
-                    ease: 'back.out(1.7)'
-                });
+                // Stats section animation - safer approach
+                const statItems = document.querySelectorAll('.stat-item');
+                if (statItems.length > 0) {
+                    gsap.fromTo('.stat-item',
+                        { scale: 0.8, opacity: 0 },
+                        {
+                            scrollTrigger: {
+                                trigger: '.stats-section',
+                                start: 'top 85%',
+                                toggleActions: 'play none none none',
+                                once: true
+                            },
+                            duration: 0.8,
+                            scale: 1,
+                            opacity: 1,
+                            stagger: 0.1,
+                            ease: 'back.out(1.7)'
+                        }
+                    );
+                }
                 
                 // Animated counter for stats
                 // Counts from 0 to target number when stats section comes into view
@@ -675,44 +745,54 @@
                     });
                 });
                 
-                // CTA section animation
-                gsap.from('.cta-content', {
-                    scrollTrigger: {
-                        trigger: '.cta-section',
-                        start: 'top 80%',
-                        toggleActions: 'play none none none'
-                    },
-                    duration: 1,
-                    scale: 0.9,
-                    opacity: 0,
-                    ease: 'back.out(1.4)'
-                });
+                // CTA section animation - safer approach
+                const ctaContent = document.querySelector('.cta-content');
+                if (ctaContent) {
+                    gsap.fromTo(ctaContent,
+                        { scale: 0.9, opacity: 0 },
+                        {
+                            scrollTrigger: {
+                                trigger: '.cta-section',
+                                start: 'top 85%',
+                                toggleActions: 'play none none none',
+                                once: true
+                            },
+                            duration: 1,
+                            scale: 1,
+                            opacity: 1,
+                            ease: 'back.out(1.4)'
+                        }
+                    );
+                }
                 
                 // ============================================
                 // POST CARD HOVER EFFECTS
                 // ============================================
                 // Enhanced hover animation for post cards using GSAP
-                document.querySelectorAll('.post-card').forEach(card => {
-                    card.addEventListener('mouseenter', () => {
-                        gsap.to(card, {
-                            y: -12,
-                            scale: 1.03,
-                            boxShadow: '0 25px 50px rgba(102, 126, 234, 0.25)',
-                            duration: 0.3,
-                            ease: 'power2.out'
+                // Wait a bit to ensure cards are rendered
+                setTimeout(() => {
+                    document.querySelectorAll('.post-card').forEach(card => {
+                        card.addEventListener('mouseenter', () => {
+                            gsap.to(card, {
+                                y: -12,
+                                scale: 1.03,
+                                boxShadow: '0 25px 50px rgba(102, 126, 234, 0.25)',
+                                duration: 0.3,
+                                ease: 'power2.out'
+                            });
+                        });
+                        
+                        card.addEventListener('mouseleave', () => {
+                            gsap.to(card, {
+                                y: 0,
+                                scale: 1,
+                                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                                duration: 0.3,
+                                ease: 'power2.out'
+                            });
                         });
                     });
-                    
-                    card.addEventListener('mouseleave', () => {
-                        gsap.to(card, {
-                            y: 0,
-                            scale: 1,
-                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-                            duration: 0.3,
-                            ease: 'power2.out'
-                        });
-                    });
-                });
+                }, 100);
                 
                 // ============================================
                 // SCROLL PROGRESS BAR
@@ -738,21 +818,24 @@
                 // Shows button after scrolling 500px, smooth scroll to top on click
                 const backToTop = document.getElementById('backToTop');
                 
-                window.addEventListener('scroll', () => {
-                    if (window.pageYOffset > 500) {
-                        backToTop.classList.add('visible');
-                    } else {
-                        backToTop.classList.remove('visible');
-                    }
-                });
-                
-                backToTop.addEventListener('click', () => {
-                    gsap.to(window, {
-                        duration: 1,
-                        scrollTo: { y: 0, autoKill: true },
-                        ease: 'power3.inOut'
+                if (backToTop) {
+                    window.addEventListener('scroll', () => {
+                        if (window.pageYOffset > 500) {
+                            backToTop.classList.add('visible');
+                        } else {
+                            backToTop.classList.remove('visible');
+                        }
                     });
-                });
+                    
+                    backToTop.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        gsap.to(window, {
+                            duration: 1,
+                            scrollTo: { y: 0, autoKill: true },
+                            ease: 'power3.inOut'
+                        });
+                    });
+                }
                 
                 // ============================================
                 // MOBILE MENU TOGGLE
@@ -785,13 +868,21 @@
                 // ============================================
                 // SMOOTH SCROLL FOR ANCHOR LINKS
                 // ============================================
-                // Smooth scroll to sections when clicking navigation links
+                // Smooth scroll to sections when clicking navigation links (same-page anchors only)
                 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                     anchor.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const target = document.querySelector(this.getAttribute('href'));
+                        const targetId = this.getAttribute('href');
                         
+                        // Skip if it's just "#" or empty
+                        if (!targetId || targetId === '#') {
+                            return;
+                        }
+                        
+                        const target = document.querySelector(targetId);
+                        
+                        // Only prevent default and animate if target exists on this page
                         if (target) {
+                            e.preventDefault();
                             gsap.to(window, {
                                 duration: 1,
                                 scrollTo: { y: target, offsetY: 80 },
@@ -805,18 +896,21 @@
                 // PARALLAX EFFECT ON POST IMAGES (Optional)
                 // ============================================
                 // Subtle parallax movement on post card images
-                gsap.utils.toArray('.post-image').forEach(image => {
-                    gsap.to(image, {
-                        scrollTrigger: {
-                            trigger: image,
-                            start: 'top bottom',
-                            end: 'bottom top',
-                            scrub: 1 // Smooth scrubbing effect
-                        },
-                        y: -30,
-                        ease: 'none'
+                const postImages = document.querySelectorAll('.post-image');
+                if (postImages.length > 0) {
+                    gsap.utils.toArray('.post-image').forEach(image => {
+                        gsap.to(image, {
+                            scrollTrigger: {
+                                trigger: image,
+                                start: 'top bottom',
+                                end: 'bottom top',
+                                scrub: 1 // Smooth scrubbing effect
+                            },
+                            y: -30,
+                            ease: 'none'
+                        });
                     });
-                });
+                }
                 
                 // ============================================
                 // ACCESSIBILITY: RESPECT REDUCED MOTION

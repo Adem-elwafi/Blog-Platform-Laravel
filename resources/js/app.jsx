@@ -1,12 +1,15 @@
 import './bootstrap';
 import { gsap } from 'gsap';
 import Alpine from 'alpinejs';
-import './react-app.jsx'; // React mount logic is bundled via the single entry
+import { mountComponents } from './utils/mountComponents';
 
 window.Alpine = Alpine;
 Alpine.start();
 
+// Mount all React island components
 document.addEventListener('DOMContentLoaded', () => {
+    mountComponents();
+    
     gsap.from('#title', {
         duration: 1,
         y: -50,

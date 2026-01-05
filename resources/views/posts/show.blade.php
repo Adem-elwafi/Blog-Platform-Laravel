@@ -78,11 +78,24 @@
             </div>
         </div>
 
-            <!-- Comments Section will be handled by React -->
-        <div id="comments-root"
-            data-post-id="{{ $post->id }}"
-            data-user='@json(auth()->user())'
-            data-comments='@json($post->comments->load("user"))'
-            data-csrf-token="{{ csrf_token() }}"
-        ></div>
+        <!-- React Comments Section -->
+        <section class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <div 
+                data-component="Comments"
+                data-post-id="{{ $post->id }}"
+                data-user="{{ auth()->check() ? json_encode(auth()->user()->only(['id', 'name', 'email', 'role'])) : 'null' }}"
+                data-initial-comments="{{ json_encode($post->comments()->with('user')->latest()->get()->map(fn($c) => [
+                    'id' => $c->id,
+                    'body' => $c->body,
+                    'created_at' => $c->created_at->toISOString(),
+                    'created_at_human' => $c->created_at->diffForHumans(),
+                    'user' => [
+                        'id' => $c->user->id,
+                        'name' => $c->user->name,
+                    ]
+                ])) }}"
+                data-csrf-token="{{ csrf_token() }}"
+            ></div>
+        </section>
+    </article>
 </x-app-layout>

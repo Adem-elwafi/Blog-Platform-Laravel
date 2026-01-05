@@ -21,7 +21,7 @@
         @endif
 
         <!-- Styles and Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/react-app.jsx'])
+        @vite(['resources/css/app.css', 'resources/js/app.jsx', 'resources/js/react-app.jsx'])
     </head>
     <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         

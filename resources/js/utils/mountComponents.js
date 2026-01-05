@@ -3,10 +3,12 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import LikeButton from '../components/LikeButton';
 import Comments from '../components/Comments';
+import PostFilters from '../components/PostFilters';
 
 const componentMap = {
   LikeButton,
   Comments,
+  PostFilters,
 };
 
 function parseProps(element) {
@@ -21,7 +23,7 @@ function parseProps(element) {
       let value = attr.value;
 
       // Handle JSON props that need parsing
-      if (propName === 'initialComments' || propName === 'user') {
+      if (propName === 'initialComments' || propName === 'user' || propName === 'authors') {
         try {
           value = JSON.parse(value);
         } catch (e) {
