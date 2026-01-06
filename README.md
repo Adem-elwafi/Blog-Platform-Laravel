@@ -1,27 +1,24 @@
 # Blog Platform
 
-A modern, feature-rich blog platform built with Laravel, Tailwind CSS, and GSAP animations. Share your stories, engage with the community through comments, and show appreciation with likes.
+Modern, animated blog platform powered by Laravel 11, Tailwind CSS, GSAP, and React islands. Posts, comments, likes, roles, dark mode, and a React-driven infinite feed all live together.
 
 ## 🌟 Features
 
-- **User Authentication** - Secure registration and login with email verification
-- **Post Management** - Create, read, update, and delete blog posts
-- **Comments System** - Interactive comment section with authorization controls
-- **Like System** - One-click like/unlike functionality with real-time counts
-- **User Roles** - Admin and regular user roles with appropriate permissions
-- **Dark Mode Support** - Seamless dark/light theme switching
-- **Responsive Design** - Mobile-first approach with Tailwind CSS breakpoints
-- **Smooth Animations** - GSAP-powered animations for enhanced UX
-- **Post Pagination** - Efficient pagination for browsing multiple posts
-- **Authorization** - Role-based access control for edit/delete operations
-- **Flash Messages** - User feedback for successful and error actions
+- **React islands**: Like buttons, comments, filters, and infinite scrolling feed mounted via `data-component` hooks
+- **Animated UX**: GSAP hero, stat counters, scroll progress, parallax cards, and smooth entrances
+- **Post & media**: CRUD with optional images, rich excerpts, and quick author context
+- **Engagement**: Comments with auth guard, like/unlike, and live counts
+- **Infinite scroll feed**: React-powered `/api/posts/feed` with Intersection Observer loading
+- **Roles & auth**: Admin vs. user permissions, email/password auth (Breeze)
+- **Theming**: Dark/light support, glassmorphism touches, responsive layouts
+- **DX niceties**: Flash messages, friendly seed data, and Vite build pipeline
 
 ## 🛠️ Tech Stack
 
 - **Backend**: Laravel 11
-- **Frontend**: Tailwind CSS, Alpine.js
-- **Animations**: GSAP (GreenSock Animation Platform)
-- **Database**: SQLite (default, configurable)
+- **Frontend**: Blade + Tailwind CSS + React islands (Vite)
+- **Animations**: GSAP + ScrollTrigger
+- **Database**: SQLite by default (env-configurable)
 - **Authentication**: Laravel Breeze
 - **Testing**: Pest PHP
 
@@ -34,299 +31,125 @@ A modern, feature-rich blog platform built with Laravel, Tailwind CSS, and GSAP 
 
 ## 🚀 Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd blog-platform
-   ```
+1) Clone and enter the project
+```bash
+git clone <repository-url>
+cd blog-platform
+```
 
-2. **Install PHP dependencies**
-   ```bash
-   composer install
-   ```
+2) Install dependencies
+```bash
+composer install
+npm install
+```
 
-3. **Install Node dependencies**
-   ```bash
-   npm install
-   ```
-
-4. **Create environment file**
-   ```bash
-   cp .env.example .env
-   ```
-
-5. **Generate application key**
-   ```bash
-   php artisan key:generate
-   ```
+3) Environment and key
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
 ## 🗄️ Database Setup
 
-1. **Run migrations**
-   ```bash
-   php artisan migrate
-   ```
+1) Migrate
+```bash
+php artisan migrate
+```
 
-2. **Seed the database** (optional - includes sample data)
-   ```bash
-   php artisan db:seed
-   ```
+2) Seed (optional but recommended for demo data)
+```bash
+php artisan db:seed
+```
+- Admin user: `admin@example.com` / `password`
+- Test user: `test@example.com` / `password`
+- Posts: 3 per existing user
+- Comments: 2 per post
+- Likes: 1–5 random users per post
 
-   This will create:
-   - Admin user: `admin@example.com` / `password`
-   - Test user: `test@example.com` / `password`
-   - 19 sample posts
-   - 38 sample comments
-   - 39 sample likes
-
-3. **Fresh database reset**
-   ```bash
-   php artisan migrate:fresh --seed
-   ```
+3) Reset with fresh seed
+```bash
+php artisan migrate:fresh --seed
+```
 
 ## 📦 Running the Application
 
-1. **Start the development server**
-   ```bash
-   php artisan serve
-   ```
+1) Backend
+```bash
+php artisan serve
+```
 
-2. **Compile frontend assets** (in another terminal)
-   ```bash
-   npm run dev
-   ```
+2) Frontend
+```bash
+npm run dev
+```
 
-3. **Build for production**
-   ```bash
-   npm run build
-   ```
+3) Production build
+```bash
+npm run build
+```
 
-4. **Access the application**
-   - Navigate to `http://localhost:8000`
+4) Open `http://localhost:8000`
 
 ## 📸 Screenshots
 
-### Welcome Page
-![Welcome Page](./screenshots/welcome.png)
-- Hero section with call-to-action
-- Feature highlights
-- Login/Register buttons
-- Responsive hero banner
+New screenshots coming. Drop your captures into `./screenshots/` and replace the placeholders below.
 
-### Home Page / Posts Index
-![Posts Index](./screenshots/posts-index.png)
-- Responsive grid layout with post cards
-- Post statistics (comments, likes, views)
-- "Read More" button for each post
-- Featured post badge
+- Welcome / hero
+	![Welcome](./screenshots/welcome.png)
+- Posts feed (infinite scroll + likes)
+	![Posts Feed](./screenshots/posts-feed.png)
+- Post detail with comments
+	![Post Detail](./screenshots/post-detail-placeholder.png)
+- Dark mode
+	![Dark Mode](./screenshots/dark-mode-placeholder.png)
+- Mobile view
+	![Mobile](./screenshots/mobile-placeholder.png)
 
-### Post Detail Page
-![Post Show](./screenshots/post-detail.png)
-- Full post content display
-- Author information with timestamp
-- Like/Unlike button with count
-- Edit/Delete buttons for authorized users
-- Comments section with form
+## 🎯 API / UI Touchpoints
 
-### Comments Section
-![Comments](./screenshots/comments-section.png)
-- Comment form for authenticated users
-- Comment list with author avatars
-- Delete option for comment owners/admins
-- Relative time display (e.g., "2 hours ago")
-
-### Dark Mode
-![Dark Mode](./screenshots/dark-mode.png)
-- Seamless dark theme support
-- High contrast for readability
-- Consistent styling across all pages
-
-### Mobile Responsive
-![Mobile View](./screenshots/mobile-responsive.png)
-- Optimized for mobile devices
-- Touch-friendly buttons
-- Stacked layout for smaller screens
-
-## 🎯 API Endpoints
-
-### Public Routes
-- `GET /` - Welcome page
-- `GET /posts` - All posts (paginated)
-- `GET /posts/{id}` - Single post detail
-
-### Authenticated Routes
-- `POST /posts` - Create new post
-- `GET /posts/create` - Post creation form
-- `PUT /posts/{id}` - Update post
-- `DELETE /posts/{id}` - Delete post
-- `GET /posts/{id}/edit` - Post edit form
-- `POST /posts/{id}/like` - Toggle like
-- `POST /posts/{id}/comments` - Add comment
-- `DELETE /comments/{id}` - Delete comment
-- `GET /profile` - User profile
-- `PUT /profile` - Update profile
-- `DELETE /profile` - Delete account
+- `GET /` welcome with GSAP hero + stat counters
+- `GET /posts` posts index with React infinite scroll feed
+- `GET /posts/{id}` post detail with React comments and like button
+- `POST /posts/{id}/like` toggle like (guarded)
+- `POST /posts/{id}/comments` add comment (guarded)
+- `GET /api/posts/feed` JSON feed used by React infinite scroll
 
 ## 🔐 Authorization
 
-### Post Operations
-- **Create**: Authenticated users only
-- **Edit/Delete**: Post owner or admin
+- Posts: create (auth), edit/delete (owner or admin)
+- Comments: create (auth), delete (owner or admin)
+- Likes: toggle (auth)
 
-### Comment Operations
-- **Create**: Authenticated users only
-- **Delete**: Comment owner or admin
+## 🧩 React Islands
 
-### Like Operations
-- **Create/Delete**: Authenticated users only
-
-## 📁 Project Structure
-
-```
-blog-platform/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── PostController.php
-│   │   │   ├── CommentController.php
-│   │   │   └── LikeController.php
-│   │   └── Middleware/
-│   └── Models/
-│       ├── User.php
-│       ├── Post.php
-│       ├── Comment.php
-│       └── Like.php
-├── database/
-│   ├── migrations/
-│   ├── factories/
-│   └── seeders/
-├── resources/
-│   ├── views/
-│   │   ├── posts/
-│   │   │   ├── index.blade.php
-│   │   │   ├── show.blade.php
-│   │   │   ├── create.blade.php
-│   │   │   └── edit.blade.php
-│   │   ├── layouts/
-│   │   └── components/
-│   ├── js/
-│   │   └── app.js
-│   └── css/
-│       └── app.css
-├── routes/
-│   ├── web.php
-│   ├── auth.php
-│   └── api.php
-└── tests/
-    ├── Feature/
-    └── Unit/
-```
+- Components live in `resources/js/components` and mount via `data-component="ComponentName"` attributes in Blade.
+- Mount helper: `resources/js/utils/mountComponents.js` (wired in `react-app.jsx`).
+- Examples: `LikeButton`, `Comments`, `PostFilters`, `InfiniteScrollPosts`.
 
 ## 🎨 Customization
 
-### Theme Colors
-Edit `tailwind.config.js` to customize color palette:
-```javascript
-theme: {
-  colors: {
-    // Your custom colors here
-  }
-}
-```
-
-### GSAP Animations
-Animations are configured in the blade templates. Modify animation parameters:
-```javascript
-gsap.to(selector, {
-  duration: 0.6,
-  opacity: 1,
-  y: 0,
-  stagger: 0.1,
-});
-```
-
-### Email Configuration
-Update `.env` file with your email provider:
-```
-MAIL_DRIVER=smtp
-MAIL_HOST=your-smtp-host
-MAIL_USERNAME=your-email
-MAIL_PASSWORD=your-password
-```
+- **Tailwind**: tweak design tokens in `tailwind.config.js`.
+- **GSAP**: hero/stats/scroll animations in `resources/views/welcome.blade.php`.
+- **React feed**: infinite scroll logic in `resources/js/components/InfiniteScrollPosts.jsx`.
 
 ## 🧪 Testing
 
-Run the test suite:
 ```bash
 php artisan test
 ```
 
-Run tests with coverage:
-```bash
-php artisan test --coverage
-```
-
-## 📝 Database Models
-
-### User
-- id, name, email, password, role, timestamps
-
-### Post
-- id, title, content, user_id, timestamps
-
-### Comment
-- id, body, post_id, user_id, timestamps
-
-### Like
-- id, post_id, user_id, timestamps
-
 ## 🚨 Troubleshooting
 
-### Database Connection Error
-- Ensure `.env` file is properly configured
-- Check database file permissions (SQLite)
+- Clear caches after config/name changes: `php artisan config:clear && php artisan cache:clear && php artisan view:clear`
+- Asset issues: `npm install && npm run dev`
+- DB issues: verify `.env` and rerun `php artisan migrate:fresh --seed`
 
-### Asset Compilation Issues
-```bash
-npm install
-npm run dev
-```
+## 📚 Useful Links
 
-### Migration Failures
-```bash
-php artisan migrate:fresh
-php artisan db:seed
-```
-
-### Permission Denied Errors
-```bash
-chmod -R 755 storage
-chmod -R 755 bootstrap/cache
-```
-
-## 📚 Additional Resources
-
-- [Laravel Documentation](https://laravel.com/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [GSAP Documentation](https://greensock.com/gsap/)
-- [Alpine.js Documentation](https://alpinejs.dev/)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is open source and available under the MIT License. See the LICENSE file for details.
-
-## 👨‍💻 Author
-
-Created as a Portfolio Project to demonstrate modern web development practices using Laravel, Tailwind CSS, and contemporary frontend technologies.
+- [Laravel Docs](https://laravel.com/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [GSAP](https://greensock.com/gsap/)
 
 ---
 
-**Happy Blogging! 🎉**
+Happy blogging! 🎉

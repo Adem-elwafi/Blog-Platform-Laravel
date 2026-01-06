@@ -14,7 +14,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
         
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css'])
         
         <style>
             /* Custom Gradient Text Effect */
@@ -536,6 +536,14 @@
         
         <!-- GSAP Animations Script -->
         <script>
+            // Debug: Log stats data from server
+            console.log('Stats from server:', {
+                posts: {{ $stats['posts'] ?? 0 }},
+                users: {{ $stats['users'] ?? 0 }},
+                comments: {{ $stats['comments'] ?? 0 }},
+                likes: {{ $stats['likes'] ?? 0 }}
+            });
+            
             // Wait for DOM to be ready
             document.addEventListener('DOMContentLoaded', function() {
                 
@@ -724,25 +732,38 @@
                     );
                 }
                 
-                // Animated counter for stats
-                // Counts from 0 to target number when stats section comes into view
+                // Animated counter for stats (fast count-up from 0 to target)
                 document.querySelectorAll('.stat-number').forEach(stat => {
-                    const target = parseInt(stat.getAttribute('data-target'));
-                    
-                    gsap.from(stat, {
-                        scrollTrigger: {
-                            trigger: '.stats-section',
-                            start: 'top 75%',
-                            toggleActions: 'play none none none'
-                        },
-                        duration: 2,
-                        textContent: 0,
-                        snap: { textContent: 1 }, // Snap to whole numbers
-                        ease: 'power1.inOut',
-                        onUpdate: function() {
-                            stat.textContent = Math.ceil(stat.textContent);
+                    const target = parseInt(stat.getAttribute('data-target'), 10);
+                    if (!target || Number.isNaN(target)) {
+                        return; // Skip invalid targets
+                    }
+
+                    // Ensure starting state is 0 before the tween runs
+                    stat.textContent = '0';
+
+                    gsap.fromTo(stat,
+                        { innerText: 0 },
+                        {
+                            scrollTrigger: {
+                                trigger: '.stats-section',
+                                start: 'top 75%',
+                                toggleActions: 'play none none none',
+                                once: true
+                            },
+                            duration: 1.2,
+                            innerText: target,
+                            ease: 'power1.out',
+                            snap: { innerText: 1 },
+                            onUpdate: () => {
+                                // Keep the number clean and fast-updating
+                                stat.textContent = Math.round(stat.innerText);
+                            },
+                            onComplete: () => {
+                                stat.textContent = target.toString();
+                            }
                         }
-                    });
+                    );
                 });
                 
                 // CTA section animation - safer approach

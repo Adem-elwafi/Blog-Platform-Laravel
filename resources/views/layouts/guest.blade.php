@@ -19,7 +19,7 @@
             <div class="w-full bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <a href="{{ route('dashboard') }}" class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {{ config('app.name', 'Blog') }}
+                        {{ config('app.name', 'Blog Platform') }}
                     </a>
                 </div>
             </div>

@@ -31,6 +31,15 @@
             </div>
         </header>
 
+        <!-- Post Image (if exists) -->
+        @if($post->image)
+            <div class="mb-8 rounded-xl overflow-hidden shadow-lg">
+                <img src="{{ asset('storage/' . $post->image) }}" 
+                     alt="{{ $post->title }}" 
+                     class="w-full h-auto object-cover max-h-[600px]">
+            </div>
+        @endif
+
         <!-- Post Content -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 md:p-8 mb-8 prose dark:prose-invert max-w-none">
             <div class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
